@@ -30,7 +30,19 @@
 
 ## Excel生成规则
 
-- **必须使用 Python + openpyxl**（全局规范）
+- **必须使用标准模板脚本**，禁止从零编写生成代码
+- 模板路径：`.claude/skills/apqp-doc-processor/scripts/`
+  - `gen_l1_template.py` → 阶段3 L1工程特性清单
+  - `gen_l2_template.py` → 阶段4 L2零部件特性清单
+  - `gen_qfd_template.py` → 阶段5 QFD质量屋矩阵
+
+**使用方式**（每次生成时严格遵循）：
+1. 将对应模板**复制**到 `output/gen_l1.py`（或 gen_l2.py / gen_qfd.py）
+2. **只修改** `CONFIG`、`L1_DATA`/`L2_DATA`/`MATRIX` 等数据区（有注释标注）
+3. 格式代码区（`def build_xxx` 函数）**一字不改**
+4. 将 `CONFIG["输出路径"]` 改为相对于 output 目录的文件名
+5. 运行：`python gen_l1.py`
+
 - 每个Excel第一个Sheet为"封面"，包含元数据：
 
 | 字段 | 值 |
