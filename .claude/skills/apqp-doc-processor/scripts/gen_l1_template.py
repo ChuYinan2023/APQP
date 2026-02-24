@@ -1,11 +1,6 @@
 """
-L1工程特性清单生成器 —— 标准模板 v2.0
-使用说明：
-  1. 填写 CONFIG 区（项目元数据）
-  2. 填写 L1_DATA 区（特性数据行）
-  3. 填写 CC_DATA 区（持续符合性数据，无则留空列表）
-  4. 填写 RV_DATA 区（反向校验数据）
-  5. 运行脚本：python gen_l1.py
+L1工程特性清单生成器
+使用方法：复制到output/gen_l1.py，填写数据区，运行 python3 gen_l1.py
 """
 
 import openpyxl
@@ -16,176 +11,151 @@ from openpyxl.utils import get_column_letter
 # CONFIG — 修改此区域
 # ============================================================
 CONFIG = {
-    "零部件名称": "",        # 例: "柴油滤清器"
-    "OEM":        "",        # 例: "Stellantis"
-    "来源文档":   "",        # 例: "PF.90150 + CTS"
-    "提取日期":   "",        # 例: "2026-02-21"
-    "输出路径":   "阶段3_L1工程特性清单.xlsx",  # 相对于脚本所在目录
+    "输出路径": "阶段2_L1工程特性清单.xlsx",
 }
 
 # ============================================================
 # L1_DATA — 修改此区域
-# 列顺序: [ID, 特性分类, 工程特性名称, 目标值/要求, 文件名称, 层级, 页码, 章节, 图表, 原文描述, 类别, 冲突项ID, 冲突/差异说明, 分析建议, 客户裁决]
+# 列顺序: [ID, 特性分类, 工程特性名称, 目标值/要求, 原文描述, 类别, 文件来源, 章节, 页码, 备注]
+# 类别: "C(关键)"=影响安全/核心功能 / "A(一般)"=其他
+# 冲突行在备注中标注，如 "[冲突] PF.90150=XX, CTS=YY"
 # ============================================================
 L1_DATA = [
-    # 示例行（删除后填入真实数据）:
-    # ["F-01", "功能", "过滤效率 ≥4μm(c)", "≥98%", "CTS 3.1", "CTS", "12", "7.1", "Table 3", "Filtration efficiency...", "C", "", "", "", ""],
+    # [1, "过滤性能", "过滤效率", "≥98% @4μm", "Filtration efficiency ≥98% @4μm", "C(关键)", "CTS", "3.1", "12", ""],
 ]
 
 # ============================================================
-# CC_DATA — Annex CC 持续符合性（无则留空）
-# 列顺序: [测试项目, 规范章节, 样本量, 接收准则, 频次]
+# GAP_DATA — 缺口清单（无则留空）
+# 列顺序: [缺失信息, 影响范围, 所需文档, 优先级]
+# 优先级: "高" / "中" / "低"
 # ============================================================
-CC_DATA = [
-    # ["过滤效率", "7.1", "6", "无失效", "每季"],
+GAP_DATA = [
+    # ["CS.00056 环境分类代码", "振动/温度具体profile", "CS.00056", "高"],
 ]
 
 # ============================================================
-# RV_DATA — 反向校验
-# 列顺序: [章节, 标题, 覆盖状态, L1 ID, 备注]
-# 覆盖状态: "✓已提取" / "未涉及" / "[缺口]"
+# CONFLICT_DATA — 冲突清单（无则留空）
+# 列顺序: [参数, 文档A值, 文档B值, 建议处理]
 # ============================================================
-RV_DATA = [
-    # ["1", "General", "✓已提取", "F-01", ""],
+CONFLICT_DATA = [
+    # ["爆破压力", "PF.90150: ≥800kPa", "CTS: ≥1000kPa", "以CTS为准"],
 ]
 
 # ============================================================
-# 以下为格式代码，不需要修改
+# 以下为格式代码，不修改
 # ============================================================
 
-# ----- 样式定义（固定，不修改）-----
-HEADER_FONT  = Font(bold=True, size=11)
-HEADER_FILL  = PatternFill(start_color="D3D3D3", end_color="D3D3D3", fill_type="solid")
-TOTAL_FILL   = PatternFill(start_color="D9D9D9", end_color="D9D9D9", fill_type="solid")
-GAP_FILL     = PatternFill(start_color="FFD966", end_color="FFD966", fill_type="solid")
-# 类别着色: C类=粉红, A类=无色
+HEADER_FONT = Font(bold=True, size=11)
+HEADER_FILL = PatternFill(start_color="D3D3D3", end_color="D3D3D3", fill_type="solid")
 CLASS_C_FILL = PatternFill(start_color="FFE6E6", end_color="FFE6E6", fill_type="solid")
+CONFLICT_FILL = PatternFill(start_color="FFD966", end_color="FFD966", fill_type="solid")
+GAP_HIGH = PatternFill(start_color="FF7F7F", end_color="FF7F7F", fill_type="solid")
+GAP_MID = PatternFill(start_color="FFD966", end_color="FFD966", fill_type="solid")
+GAP_LOW = PatternFill(start_color="E2EFDA", end_color="E2EFDA", fill_type="solid")
 THIN = Border(
     left=Side(style='thin'), right=Side(style='thin'),
-    top=Side(style='thin'),  bottom=Side(style='thin'),
+    top=Side(style='thin'), bottom=Side(style='thin'),
 )
 WRAP_TOP = Alignment(wrap_text=True, vertical='top')
-CENTER   = Alignment(horizontal='center', vertical='center', wrap_text=True)
+CENTER = Alignment(horizontal='center', vertical='center', wrap_text=True)
+
+L1_HEADERS = ["ID", "特性分类", "工程特性名称", "目标值/要求", "原文描述", "类别", "文件来源", "章节", "页码", "备注"]
+L1_WIDTHS = [6, 15, 40, 30, 50, 10, 20, 10, 6, 30]
 
 
-def apply_header(ws, headers, col_widths, row_height=30):
+def apply_header(ws, headers, widths):
     ws.append(headers)
-    ws.row_dimensions[1].height = row_height
-    for c, w in enumerate(col_widths, 1):
+    ws.row_dimensions[1].height = 30
+    for c, w in enumerate(widths, 1):
         ws.column_dimensions[get_column_letter(c)].width = w
         cell = ws.cell(1, c)
-        cell.font  = HEADER_FONT
-        cell.fill  = HEADER_FILL
+        cell.font = HEADER_FONT
+        cell.fill = HEADER_FILL
         cell.alignment = CENTER
         cell.border = THIN
     ws.freeze_panes = "A2"
 
 
-def apply_data_border(ws, start_row, end_row, ncols, class_col=None):
-    for r in range(start_row, end_row + 1):
-        cls = ws.cell(r, class_col).value if class_col else None
-        for c in range(1, ncols + 1):
+def build_l1(wb):
+    ws = wb.active
+    ws.title = "工程特性清单"
+    apply_header(ws, L1_HEADERS, L1_WIDTHS)
+    for row in L1_DATA:
+        ws.append(row)
+    for r in range(2, len(L1_DATA) + 2):
+        cls = ws.cell(r, 6).value  # 类别列
+        note = str(ws.cell(r, 10).value or "")  # 备注列
+        for c in range(1, len(L1_HEADERS) + 1):
             cell = ws.cell(r, c)
             cell.border = THIN
             cell.alignment = WRAP_TOP
-            if cls and str(cls).upper() == "C":
+            if "[冲突]" in note:
+                cell.fill = CONFLICT_FILL
+            elif str(cls).startswith("C"):
                 cell.fill = CLASS_C_FILL
 
 
-def build_cover(wb):
-    ws = wb.active
-    ws.title = "封面"
-    fields = [
-        ("零部件名称", CONFIG["零部件名称"]),
-        ("OEM",        CONFIG["OEM"]),
-        ("来源文档",   CONFIG["来源文档"]),
-        ("提取日期",   CONFIG["提取日期"]),
-        ("阶段",       "3 - L1工程特性清单"),
-    ]
-    for r, (k, v) in enumerate(fields, 1):
-        ws.cell(r, 1, k).font = Font(bold=True)
-        ws.cell(r, 1).border = THIN
-        ws.cell(r, 2, v).border = THIN
-        ws.cell(r, 2).alignment = WRAP_TOP
-    ws.column_dimensions['A'].width = 18
-    ws.column_dimensions['B'].width = 70
+def build_gaps(wb):
+    ws = wb.create_sheet("缺口与冲突")
 
-
-def build_l1(wb):
-    ws = wb.create_sheet("工程特性清单")
-    headers    = ["ID", "特性分类", "工程特性名称", "目标值/要求", "文件名称", "层级", "页码", "章节", "图表", "原文描述", "类别", "冲突项ID", "冲突/差异说明", "分析建议", "客户裁决"]
-    col_widths = [8,    15,         50,              30,            40,         12,     8,      12,     12,     60,         8,      15,          30,              30,         20]
-    apply_header(ws, headers, col_widths)
-    for row in L1_DATA:
-        ws.append(row)
-    # class_col=11 is the "类别" column (K)
-    apply_data_border(ws, 2, len(L1_DATA) + 1, len(headers), class_col=11)
-
-
-def build_cc(wb):
-    ws = wb.create_sheet("CC持续符合性")
-    headers    = ["测试项目", "规范章节", "样本量", "接收准则", "频次"]
-    col_widths = [35,         14,          10,        20,          15]
-    apply_header(ws, headers, col_widths)
-    for row in CC_DATA:
-        ws.append(row)
-    apply_data_border(ws, 2, len(CC_DATA) + 1, len(headers))
-
-
-def build_rv(wb):
-    ws = wb.create_sheet("反向校验")
-    headers    = ["章节",  "标题",   "覆盖状态",  "L1 ID",  "备注"]
-    col_widths = [18,       30,        12,           22,        35]
-    apply_header(ws, headers, col_widths)
-    for row in RV_DATA:
-        ws.append(row)
-    apply_data_border(ws, 2, len(RV_DATA) + 1, len(headers))
-    # 高亮缺口行
-    for r in range(2, len(RV_DATA) + 2):
-        status_cell = ws.cell(r, 3)
-        if status_cell.value and "[缺口]" in str(status_cell.value):
-            for c in range(1, len(headers) + 1):
-                ws.cell(r, c).fill = GAP_FILL
-
-
-def build_stats(wb):
-    ws = wb.create_sheet("统计汇总")
-    headers    = ["类别", "数量"]
-    col_widths = [12,      10]
-    apply_header(ws, headers, col_widths)
-    counts = {"C": 0, "A": 0}
-    for row in L1_DATA:
-        cls = str(row[10]).upper() if len(row) > 10 and row[10] else ""
-        if cls in counts:
-            counts[cls] += 1
-    for r, (code, cnt) in enumerate(counts.items(), 2):
-        ws.cell(r, 1, code).border = THIN
-        ws.cell(r, 2, cnt).border = THIN
-    total_r = len(counts) + 2
-    for c, v in enumerate(["合计", sum(counts.values())], 1):
-        cell = ws.cell(total_r, c, v)
-        cell.font = Font(bold=True)
-        cell.fill = TOTAL_FILL
+    # 缺口部分
+    ws.cell(1, 1, "— 缺口 —").font = Font(bold=True, size=12)
+    gap_headers = ["缺失信息", "影响范围", "所需文档", "优先级"]
+    gap_widths = [40, 30, 30, 10]
+    for c, (h, w) in enumerate(zip(gap_headers, gap_widths), 1):
+        cell = ws.cell(2, c, h)
+        cell.font = HEADER_FONT
+        cell.fill = HEADER_FILL
         cell.border = THIN
+        cell.alignment = CENTER
+        ws.column_dimensions[get_column_letter(c)].width = w
+
+    priority_fills = {"高": GAP_HIGH, "中": GAP_MID, "低": GAP_LOW}
+    for i, row in enumerate(GAP_DATA, 3):
+        for c, v in enumerate(row, 1):
+            cell = ws.cell(i, c, v)
+            cell.border = THIN
+            cell.alignment = WRAP_TOP
+        p = row[3] if len(row) > 3 else ""
+        if p in priority_fills:
+            for c in range(1, len(gap_headers) + 1):
+                ws.cell(i, c).fill = priority_fills[p]
+
+    # 冲突部分
+    conflict_start = len(GAP_DATA) + 5
+    ws.cell(conflict_start, 1, "— 冲突 —").font = Font(bold=True, size=12)
+    conflict_headers = ["参数", "文档A值", "文档B值", "建议处理"]
+    conflict_widths = [30, 30, 30, 30]
+    for c, (h, w) in enumerate(zip(conflict_headers, conflict_widths), 1):
+        cell = ws.cell(conflict_start + 1, c, h)
+        cell.font = HEADER_FONT
+        cell.fill = HEADER_FILL
+        cell.border = THIN
+        cell.alignment = CENTER
+        ws.column_dimensions[get_column_letter(c)].width = max(
+            ws.column_dimensions[get_column_letter(c)].width or 0, w
+        )
+    for i, row in enumerate(CONFLICT_DATA, conflict_start + 2):
+        for c, v in enumerate(row, 1):
+            cell = ws.cell(i, c, v)
+            cell.border = THIN
+            cell.alignment = WRAP_TOP
+            cell.fill = CONFLICT_FILL
 
 
 def main():
     wb = openpyxl.Workbook()
-    build_cover(wb)
     build_l1(wb)
-    if CC_DATA:
-        build_cc(wb)
-    build_rv(wb)
-    build_stats(wb)
+    if GAP_DATA or CONFLICT_DATA:
+        build_gaps(wb)
     wb.save(CONFIG["输出路径"])
-    counts = {"C": 0, "A": 0}
-    for row in L1_DATA:
-        cls = str(row[10]).upper() if len(row) > 10 and row[10] else ""
-        if cls in counts:
-            counts[cls] += 1
+    c_count = sum(1 for r in L1_DATA if len(r) > 5 and str(r[5]).startswith("C"))
     print(f"已保存: {CONFIG['输出路径']}")
-    print(f"L1特性合计: {len(L1_DATA)} 条")
-    print(f"  C类(关键): {counts['C']}  A类(一般): {counts['A']}")
+    print(f"L1特性: {len(L1_DATA)} 条 (C类:{c_count}, A类:{len(L1_DATA)-c_count})")
+    if GAP_DATA:
+        print(f"缺口: {len(GAP_DATA)} 项")
+    if CONFLICT_DATA:
+        print(f"冲突: {len(CONFLICT_DATA)} 项")
 
 
 if __name__ == "__main__":
