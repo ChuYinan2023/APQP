@@ -1,5 +1,5 @@
 """
-L1工程特性清单生成器 —— 标准模板 v1.0
+L1工程特性清单生成器 —— 标准模板 v2.0
 使用说明：
   1. 填写 CONFIG 区（项目元数据）
   2. 填写 L1_DATA 区（特性数据行）
@@ -25,11 +25,11 @@ CONFIG = {
 
 # ============================================================
 # L1_DATA — 修改此区域
-# 列顺序: [ID, 分类, 特性名称, 目标值/范围, 单位, 条件/标准, 来源, 文档层级]
+# 列顺序: [ID, 特性分类, 工程特性名称, 目标值/要求, 文件名称, 层级, 页码, 章节, 图表, 原文描述, 类别, 冲突项ID, 冲突/差异说明, 分析建议, 客户裁决]
 # ============================================================
 L1_DATA = [
     # 示例行（删除后填入真实数据）:
-    # ["F-01", "F", "过滤效率 ≥4μm(c)", "≥98%", "%", "ISO 19438, @190 l/h", "CTS 3.1 / PF.90150 7.1", "CTS覆盖"],
+    # ["F-01", "功能", "过滤效率 ≥4μm(c)", "≥98%", "CTS 3.1", "CTS", "12", "7.1", "Table 3", "Filtration efficiency...", "C", "", "", "", ""],
 ]
 
 # ============================================================
@@ -54,23 +54,12 @@ RV_DATA = [
 # ============================================================
 
 # ----- 样式定义（固定，不修改）-----
-HEADER_FONT  = Font(bold=True, size=11, color="FFFFFF")
-HEADER_FILL  = PatternFill(start_color="2F5496", end_color="2F5496", fill_type="solid")
+HEADER_FONT  = Font(bold=True, size=11)
+HEADER_FILL  = PatternFill(start_color="D3D3D3", end_color="D3D3D3", fill_type="solid")
 TOTAL_FILL   = PatternFill(start_color="D9D9D9", end_color="D9D9D9", fill_type="solid")
 GAP_FILL     = PatternFill(start_color="FFD966", end_color="FFD966", fill_type="solid")
-CAT_FILLS = {
-    "F": PatternFill(start_color="D6E4F0", end_color="D6E4F0", fill_type="solid"),
-    "P": PatternFill(start_color="E2EFDA", end_color="E2EFDA", fill_type="solid"),
-    "M": PatternFill(start_color="FCE4D6", end_color="FCE4D6", fill_type="solid"),
-    "R": PatternFill(start_color="FFF2CC", end_color="FFF2CC", fill_type="solid"),
-    "E": PatternFill(start_color="D9E2F3", end_color="D9E2F3", fill_type="solid"),
-    "S": PatternFill(start_color="F8CBAD", end_color="F8CBAD", fill_type="solid"),
-    "A": PatternFill(start_color="E2D9F3", end_color="E2D9F3", fill_type="solid"),
-}
-CAT_NAMES = {
-    "F": "功能", "P": "性能/电气", "M": "机械/结构",
-    "R": "可靠性/耐久", "E": "环境/防护", "S": "安全/法规", "A": "外观/感知",
-}
+# 类别着色: C类=粉红, A类=无色
+CLASS_C_FILL = PatternFill(start_color="FFE6E6", end_color="FFE6E6", fill_type="solid")
 THIN = Border(
     left=Side(style='thin'), right=Side(style='thin'),
     top=Side(style='thin'),  bottom=Side(style='thin'),
@@ -79,8 +68,9 @@ WRAP_TOP = Alignment(wrap_text=True, vertical='top')
 CENTER   = Alignment(horizontal='center', vertical='center', wrap_text=True)
 
 
-def apply_header(ws, headers, col_widths):
+def apply_header(ws, headers, col_widths, row_height=30):
     ws.append(headers)
+    ws.row_dimensions[1].height = row_height
     for c, w in enumerate(col_widths, 1):
         ws.column_dimensions[get_column_letter(c)].width = w
         cell = ws.cell(1, c)
@@ -88,19 +78,18 @@ def apply_header(ws, headers, col_widths):
         cell.fill  = HEADER_FILL
         cell.alignment = CENTER
         cell.border = THIN
-    ws.freeze_panes = f"A2"
-    ws.auto_filter.ref = ws.dimensions
+    ws.freeze_panes = "A2"
 
 
-def apply_data_border(ws, start_row, end_row, ncols, cat_col=None):
+def apply_data_border(ws, start_row, end_row, ncols, class_col=None):
     for r in range(start_row, end_row + 1):
-        cat = ws.cell(r, cat_col).value if cat_col else None
+        cls = ws.cell(r, class_col).value if class_col else None
         for c in range(1, ncols + 1):
             cell = ws.cell(r, c)
             cell.border = THIN
             cell.alignment = WRAP_TOP
-            if cat and cat in CAT_FILLS:
-                cell.fill = CAT_FILLS[cat]
+            if cls and str(cls).upper() == "C":
+                cell.fill = CLASS_C_FILL
 
 
 def build_cover(wb):
@@ -123,13 +112,14 @@ def build_cover(wb):
 
 
 def build_l1(wb):
-    ws = wb.create_sheet("L1特性清单")
-    headers    = ["ID", "分类", "特性名称", "目标值/范围", "单位", "条件/标准", "来源", "文档层级"]
-    col_widths = [8,    6,      42,          38,            10,     50,          32,     22]
+    ws = wb.create_sheet("工程特性清单")
+    headers    = ["ID", "特性分类", "工程特性名称", "目标值/要求", "文件名称", "层级", "页码", "章节", "图表", "原文描述", "类别", "冲突项ID", "冲突/差异说明", "分析建议", "客户裁决"]
+    col_widths = [8,    15,         50,              30,            40,         12,     8,      12,     12,     60,         8,      15,          30,              30,         20]
     apply_header(ws, headers, col_widths)
     for row in L1_DATA:
         ws.append(row)
-    apply_data_border(ws, 2, len(L1_DATA) + 1, len(headers), cat_col=2)
+    # class_col=11 is the "类别" column (K)
+    apply_data_border(ws, 2, len(L1_DATA) + 1, len(headers), class_col=11)
 
 
 def build_cc(wb):
@@ -160,21 +150,19 @@ def build_rv(wb):
 
 def build_stats(wb):
     ws = wb.create_sheet("统计汇总")
-    headers    = ["分类代码", "分类名称",   "数量"]
-    col_widths = [12,          22,            10]
+    headers    = ["类别", "数量"]
+    col_widths = [12,      10]
     apply_header(ws, headers, col_widths)
-    counts = {}
+    counts = {"C": 0, "A": 0}
     for row in L1_DATA:
-        counts[row[1]] = counts.get(row[1], 0) + 1
-    for r, code in enumerate(["F", "P", "M", "R", "E", "S", "A"], 2):
+        cls = str(row[10]).upper() if len(row) > 10 and row[10] else ""
+        if cls in counts:
+            counts[cls] += 1
+    for r, (code, cnt) in enumerate(counts.items(), 2):
         ws.cell(r, 1, code).border = THIN
-        ws.cell(r, 2, CAT_NAMES.get(code, "")).border = THIN
-        ws.cell(r, 3, counts.get(code, 0)).border = THIN
-        if code in CAT_FILLS:
-            for c in range(1, 4):
-                ws.cell(r, c).fill = CAT_FILLS[code]
-    total_r = 9
-    for c, v in enumerate(["-", "合计", sum(counts.values())], 1):
+        ws.cell(r, 2, cnt).border = THIN
+    total_r = len(counts) + 2
+    for c, v in enumerate(["合计", sum(counts.values())], 1):
         cell = ws.cell(total_r, c, v)
         cell.font = Font(bold=True)
         cell.fill = TOTAL_FILL
@@ -190,14 +178,14 @@ def main():
     build_rv(wb)
     build_stats(wb)
     wb.save(CONFIG["输出路径"])
-    counts = {}
+    counts = {"C": 0, "A": 0}
     for row in L1_DATA:
-        counts[row[1]] = counts.get(row[1], 0) + 1
+        cls = str(row[10]).upper() if len(row) > 10 and row[10] else ""
+        if cls in counts:
+            counts[cls] += 1
     print(f"已保存: {CONFIG['输出路径']}")
-    print(f"L1特性合计: {sum(counts.values())} 条")
-    for code in ["F", "P", "M", "R", "E", "S", "A"]:
-        if counts.get(code):
-            print(f"  {code} ({CAT_NAMES[code]}): {counts[code]}")
+    print(f"L1特性合计: {len(L1_DATA)} 条")
+    print(f"  C类(关键): {counts['C']}  A类(一般): {counts['A']}")
 
 
 if __name__ == "__main__":

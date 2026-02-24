@@ -1,5 +1,5 @@
 """
-L2零部件特性清单生成器 —— 标准模板 v1.0
+L2零部件特性清单生成器 —— 标准模板 v2.0
 使用说明：
   1. 填写 CONFIG 区
   2. 填写 BOM_DATA 区（BOM结构树）
@@ -36,11 +36,10 @@ BOM_DATA = [
 
 # ============================================================
 # L2_DATA — L2特性
-# 列顺序: [L2 ID, 零部件, 特性名称, 目标值/范围, 单位, 关联L1 ID, 来源]
-# L2 ID格式: L2-{零部件序号}.{特性序号} (例: L2-1.01, L2-2.05)
+# 列顺序: [ID, 零件/组件名称, 零件特性, 目标值/要求, 对应第一阶段工程特性, 文件来源, 章节, 备注]
 # ============================================================
 L2_DATA = [
-    # ["L2-1.01", "壳体", "材料牌号", "PA66-GF30", "-", "M-07", "PF.90150 6.2.1"],
+    # ["L2-1.01", "壳体", "材料牌号", "PA66-GF30", "M-07 材料要求", "PF.90150", "6.2.1", ""],
 ]
 
 # ============================================================
@@ -64,19 +63,14 @@ RV_DATA = [
 # 以下为格式代码，不需要修改
 # ============================================================
 
-HEADER_FONT = Font(bold=True, size=11, color="FFFFFF")
-HEADER_FILL = PatternFill(start_color="2F5496", end_color="2F5496", fill_type="solid")
+HEADER_FONT = Font(bold=True, size=11)
+HEADER_FILL = PatternFill(start_color="B8CCE4", end_color="B8CCE4", fill_type="solid")
 TOTAL_FILL  = PatternFill(start_color="D9D9D9", end_color="D9D9D9", fill_type="solid")
 GAP_HIGH    = PatternFill(start_color="FF7F7F", end_color="FF7F7F", fill_type="solid")
 GAP_MID     = PatternFill(start_color="FFD966", end_color="FFD966", fill_type="solid")
 GAP_LOW     = PatternFill(start_color="E2EFDA", end_color="E2EFDA", fill_type="solid")
 RV_GAP_FILL = PatternFill(start_color="FFD966", end_color="FFD966", fill_type="solid")
 
-# 按零部件序号分配行颜色（交替浅色区分不同零部件）
-PART_FILLS = [
-    PatternFill(start_color="FFFFFF", end_color="FFFFFF", fill_type="solid"),
-    PatternFill(start_color="EBF3FB", end_color="EBF3FB", fill_type="solid"),
-]
 THIN = Border(
     left=Side(style='thin'), right=Side(style='thin'),
     top=Side(style='thin'),  bottom=Side(style='thin'),
@@ -85,8 +79,9 @@ WRAP_TOP = Alignment(wrap_text=True, vertical='top')
 CENTER   = Alignment(horizontal='center', vertical='center', wrap_text=True)
 
 
-def apply_header(ws, headers, col_widths):
+def apply_header(ws, headers, col_widths, row_height=30):
     ws.append(headers)
+    ws.row_dimensions[1].height = row_height
     for c, w in enumerate(col_widths, 1):
         ws.column_dimensions[get_column_letter(c)].width = w
         cell = ws.cell(1, c)
@@ -95,7 +90,6 @@ def apply_header(ws, headers, col_widths):
         cell.alignment = CENTER
         cell.border    = THIN
     ws.freeze_panes = "A2"
-    ws.auto_filter.ref = ws.dimensions
 
 
 def build_cover(wb):
@@ -131,21 +125,17 @@ def build_bom(wb):
 
 
 def build_l2(wb):
-    ws = wb.create_sheet("L2特性清单")
-    headers    = ["L2 ID",   "零部件",  "特性名称",  "目标值/范围",  "单位",  "关联L1 ID",  "来源"]
-    col_widths = [12,         18,         42,            38,             10,       14,             30]
+    ws = wb.create_sheet("零件特性清单")
+    headers    = ["ID", "零件/组件名称", "零件特性", "目标值/要求", "对应第一阶段工程特性", "文件来源", "章节", "备注"]
+    col_widths = [10,   25,               50,          35,            30,                      30,         12,     15]
     apply_header(ws, headers, col_widths)
-    # 按零部件序号分配交替色
     for row in L2_DATA:
         ws.append(row)
-    for r, row in enumerate(L2_DATA, 2):
-        part_no = row[0].split(".")[0].replace("L2-", "") if row[0] else "0"
-        fill_idx = (int(part_no) - 1) % 2 if part_no.isdigit() else 0
+    for r in range(2, len(L2_DATA) + 2):
         for c in range(1, len(headers) + 1):
             cell = ws.cell(r, c)
             cell.border    = THIN
             cell.alignment = WRAP_TOP
-            cell.fill      = PART_FILLS[fill_idx]
 
 
 def build_gaps(wb):

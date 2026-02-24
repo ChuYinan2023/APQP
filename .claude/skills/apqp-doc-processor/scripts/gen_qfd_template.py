@@ -1,5 +1,5 @@
 """
-QFD质量屋矩阵生成器 —— 标准模板 v1.0
+QFD质量屋矩阵生成器 —— 标准模板 v2.0
 使用说明：
   1. 填写 CONFIG 区
   2. 填写 L1_ITEMS / L2_ITEMS 区（从已生成的L1/L2清单导入标题）
@@ -25,18 +25,18 @@ CONFIG = {
 
 # ============================================================
 # L1_ITEMS — L1工程特性列表
-# 格式: [(ID, 分类, 特性名称, 重要度权重1-5), ...]
+# 格式: [(ID, 特性名称), ...]
 # ============================================================
 L1_ITEMS = [
-    # ("F-01", "F", "过滤效率 ≥4μm(c)", 5),
+    # ("F-01", "过滤效率 ≥4μm(c)"),
 ]
 
 # ============================================================
 # L2_ITEMS — L2零部件特性列表
-# 格式: [(L2_ID, 零部件, 特性名称), ...]
+# 格式: [(L2_ID, 零部件名称, 特性名称, 目标值), ...]
 # ============================================================
 L2_ITEMS = [
-    # ("L2-1.01", "壳体", "材料牌号"),
+    # ("L2-1.01", "壳体", "材料牌号", "PA66-GF30"),
 ]
 
 # ============================================================
@@ -58,40 +58,29 @@ MATRIX = {
 # ============================================================
 ROOF = {
     # ("L2-2.01", "L2-2.02"): "+",   # 滤芯材料 与 滤芯面积 正相关
-    # ("F-01", "M-01"): "-",          # 过滤效率 与 压降 负相关（示例）
 }
 
 # ============================================================
 # 以下为格式代码，不需要修改
 # ============================================================
 
-# 关联符号和得分
+# 关联符号（无背景色）
 SCORE_MAP  = {9: "◎", 3: "○", 1: "△"}
-SCORE_FILL = {
-    9: PatternFill(start_color="1F4E79", end_color="1F4E79", fill_type="solid"),  # 深蓝 强
-    3: PatternFill(start_color="2E75B6", end_color="2E75B6", fill_type="solid"),  # 中蓝 中
-    1: PatternFill(start_color="BDD7EE", end_color="BDD7EE", fill_type="solid"),  # 浅蓝 弱
-}
-SCORE_FONT = {
-    9: Font(bold=True, color="FFFFFF"),
-    3: Font(bold=True, color="FFFFFF"),
-    1: Font(color="000000"),
-}
 ROOF_FILL = {
     "+": PatternFill(start_color="E2EFDA", end_color="E2EFDA", fill_type="solid"),
     "-": PatternFill(start_color="FCE4D6", end_color="FCE4D6", fill_type="solid"),
 }
-CAT_FILLS = {
-    "F": PatternFill(start_color="D6E4F0", end_color="D6E4F0", fill_type="solid"),
-    "P": PatternFill(start_color="E2EFDA", end_color="E2EFDA", fill_type="solid"),
-    "M": PatternFill(start_color="FCE4D6", end_color="FCE4D6", fill_type="solid"),
-    "R": PatternFill(start_color="FFF2CC", end_color="FFF2CC", fill_type="solid"),
-    "E": PatternFill(start_color="D9E2F3", end_color="D9E2F3", fill_type="solid"),
-    "S": PatternFill(start_color="F8CBAD", end_color="F8CBAD", fill_type="solid"),
-    "A": PatternFill(start_color="E2D9F3", end_color="E2D9F3", fill_type="solid"),
-}
-HEADER_FONT  = Font(bold=True, size=10, color="FFFFFF")
-HEADER_FILL  = PatternFill(start_color="2F5496", end_color="2F5496", fill_type="solid")
+# 标题区样式
+TITLE_FILL   = PatternFill(start_color="4472C4", end_color="4472C4", fill_type="solid")
+TITLE_FONT   = Font(bold=True, size=12, color="FFFFFF")
+# L2列表头样式
+L2_ROW1_FILL = PatternFill(start_color="D9E1F2", end_color="D9E1F2", fill_type="solid")  # 零件名称行
+L2_ROW1_FONT = Font(bold=True, size=10)
+L2_ROW2_FILL = PatternFill(start_color="E7E6E6", end_color="E7E6E6", fill_type="solid")  # PC-ID + 特性描述行
+L1_ID_FILL   = PatternFill(start_color="E7E6E6", end_color="E7E6E6", fill_type="solid")  # L1 ID列底色
+# 辅助Sheet表头
+HEADER_FONT  = Font(bold=True, size=10)
+HEADER_FILL  = PatternFill(start_color="D9E1F2", end_color="D9E1F2", fill_type="solid")
 TOTAL_FILL   = PatternFill(start_color="D9D9D9", end_color="D9D9D9", fill_type="solid")
 THIN = Border(
     left=Side(style='thin'), right=Side(style='thin'),
@@ -127,52 +116,81 @@ def build_matrix(wb):
     n_l1 = len(L1_ITEMS)
     n_l2 = len(L2_ITEMS)
 
-    # 构建索引
-    l1_index = {item[0]: i for i, item in enumerate(L1_ITEMS)}
-    l2_index = {item[0]: i for i, item in enumerate(L2_ITEMS)}
+    # 固定列: L1 ID(A), L1特性名称(B), 空白分隔(C)，L2列从 col=4(D) 开始
+    L2_START_COL = 4
 
-    # 固定列: ID(1) 分类(2) 特性名称(3) 权重(4)，然后 L2 列从 col=5 开始
-    L2_START_COL = 5
+    # --- 标题区: A1:C3 合并 ---
+    ws.merge_cells("A1:C3")
+    title_cell = ws.cell(1, 1, "QFD第二阶段质量屋\n工程特性 → 零件特性")
+    title_cell.font = TITLE_FONT
+    title_cell.fill = TITLE_FILL
+    title_cell.alignment = CENTER
+    title_cell.border = THIN
+    # 给合并区域加边框
+    for r in range(1, 4):
+        for c in range(1, 4):
+            ws.cell(r, c).border = THIN
 
-    # --- 行1: L2 ID 标题行 ---
-    ws.cell(1, 1, "L1 ID").font   = HEADER_FONT
-    ws.cell(1, 1).fill             = HEADER_FILL
-    ws.cell(1, 1).alignment        = CENTER
-    ws.cell(1, 2, "分类").font     = HEADER_FONT
-    ws.cell(1, 2).fill             = HEADER_FILL
-    ws.cell(1, 2).alignment        = CENTER
-    ws.cell(1, 3, "L1特性名称").font = HEADER_FONT
-    ws.cell(1, 3).fill              = HEADER_FILL
-    ws.cell(1, 3).alignment         = CENTER
-    ws.cell(1, 4, "重要度").font   = HEADER_FONT
-    ws.cell(1, 4).fill             = HEADER_FILL
-    ws.cell(1, 4).alignment        = CENTER
-    for j, (l2id, part, name) in enumerate(L2_ITEMS):
+    # --- L2列3行表头 ---
+    # 按零件名称分组，确定每个零件的起始列和列数
+    part_groups = {}  # {零件名: [col_indices]}
+    for j, (l2id, part, name, target) in enumerate(L2_ITEMS):
         col = L2_START_COL + j
-        ws.cell(1, col, f"{l2id}\n{part}\n{name}").font = HEADER_FONT
-        ws.cell(1, col).fill       = HEADER_FILL
-        ws.cell(1, col).alignment  = CENTER
-        ws.column_dimensions[get_column_letter(col)].width = 10
-    # 最后一列：加权得分
-    score_col = L2_START_COL + n_l2
-    ws.cell(1, score_col, "加权得分").font = HEADER_FONT
-    ws.cell(1, score_col).fill             = HEADER_FILL
-    ws.cell(1, score_col).alignment        = CENTER
-    ws.column_dimensions[get_column_letter(score_col)].width = 12
+        part_groups.setdefault(part, []).append(col)
+        ws.column_dimensions[get_column_letter(col)].width = 18
 
-    # --- 数据行 ---
-    for i, (l1id, cat, name, weight) in enumerate(L1_ITEMS):
-        row = i + 2
-        ws.cell(row, 1, l1id).alignment   = CENTER
-        ws.cell(row, 2, cat).alignment    = CENTER
-        ws.cell(row, 3, name).alignment   = WRAP_TOP
-        ws.cell(row, 4, weight).alignment = CENTER
-        if cat in CAT_FILLS:
-            for c in range(1, 5):
-                ws.cell(row, c).fill = CAT_FILLS[cat]
+    # Row 1: 零件名称（合并同一零件的列）
+    for part, cols in part_groups.items():
+        start_col = min(cols)
+        end_col = max(cols)
+        if start_col != end_col:
+            ws.merge_cells(start_row=1, start_column=start_col, end_row=1, end_column=end_col)
+        cell = ws.cell(1, start_col, part)
+        cell.font = L2_ROW1_FONT
+        cell.fill = L2_ROW1_FILL
+        cell.alignment = CENTER
+        cell.border = THIN
+        # 边框 for all merged cells
+        for c in cols:
+            ws.cell(1, c).border = THIN
+            ws.cell(1, c).fill = L2_ROW1_FILL
+
+    # Row 2: PC-ID + 特性描述
+    for j, (l2id, part, name, target) in enumerate(L2_ITEMS):
+        col = L2_START_COL + j
+        cell = ws.cell(2, col, f"{l2id}\n{name}")
+        cell.fill = L2_ROW2_FILL
+        cell.alignment = CENTER
+        cell.border = THIN
+
+    # Row 3: 目标值
+    for j, (l2id, part, name, target) in enumerate(L2_ITEMS):
+        col = L2_START_COL + j
+        cell = ws.cell(3, col, target)
+        cell.alignment = CENTER
+        cell.border = THIN
+
+    # L1固定列表头 (rows 1-3 already used for title merge in A:C)
+    # Row 1-3 A:C is title area, no separate L1 header needed there
+
+    # --- 数据行 (from row 4) ---
+    DATA_START_ROW = 4
+    for i, (l1id, name) in enumerate(L1_ITEMS):
+        row = DATA_START_ROW + i
+        # L1 ID column
+        id_cell = ws.cell(row, 1, l1id)
+        id_cell.alignment = CENTER
+        id_cell.fill = L1_ID_FILL
+        id_cell.border = THIN
+        # L1 特性名称
+        name_cell = ws.cell(row, 2, name)
+        name_cell.alignment = WRAP_TOP
+        name_cell.border = THIN
+        # 空白分隔列
+        ws.cell(row, 3).border = THIN
+
         # 关联格
-        weighted_score = 0
-        for j, (l2id, _, _) in enumerate(L2_ITEMS):
+        for j, (l2id, _, _, _) in enumerate(L2_ITEMS):
             col = L2_START_COL + j
             score = MATRIX.get((l1id, l2id), 0)
             cell = ws.cell(row, col)
@@ -180,53 +198,26 @@ def build_matrix(wb):
             cell.border    = THIN
             if score:
                 cell.value = SCORE_MAP[score]
-                cell.font  = SCORE_FONT[score]
-                cell.fill  = SCORE_FILL[score]
-                weighted_score += score * weight
-        ws.cell(row, score_col, weighted_score).alignment = CENTER
-        ws.cell(row, score_col).border = THIN
-
-    # --- 列得分行（最后一行）---
-    score_row = n_l1 + 2
-    ws.cell(score_row, 3, "L2列得分合计").font = Font(bold=True)
-    ws.cell(score_row, 3).fill = TOTAL_FILL
-    for j, (l2id, _, _) in enumerate(L2_ITEMS):
-        col = L2_START_COL + j
-        col_score = sum(
-            MATRIX.get((l1id, l2id), 0) * weight
-            for l1id, _, _, weight in L1_ITEMS
-        )
-        ws.cell(score_row, col, col_score).font      = Font(bold=True)
-        ws.cell(score_row, col).fill                 = TOTAL_FILL
-        ws.cell(score_row, col).alignment            = CENTER
-        ws.cell(score_row, col).border               = THIN
 
     # 固定列宽
     ws.column_dimensions['A'].width = 10
-    ws.column_dimensions['B'].width = 6
-    ws.column_dimensions['C'].width = 35
-    ws.column_dimensions['D'].width = 8
-    ws.column_dimensions[get_column_letter(score_col)].width = 12
+    ws.column_dimensions['B'].width = 35
+    ws.column_dimensions['C'].width = 2
 
-    # 边框和border L1固定列
-    for r in range(1, n_l1 + 3):
-        for c in range(1, 5):
-            ws.cell(r, c).border = THIN
-
-    ws.freeze_panes = f"{get_column_letter(L2_START_COL)}2"
+    # 冻结窗格: D4
+    ws.freeze_panes = "D4"
 
 
 def build_roof(wb):
     ws = wb.create_sheet("屋顶矩阵")
     n = len(L2_ITEMS)
-    l2_ids = [item[0] for item in L2_ITEMS]
 
     # 标题行
     ws.cell(1, 1, "L2 ID").font    = HEADER_FONT
     ws.cell(1, 1).fill             = HEADER_FILL
     ws.cell(1, 1).alignment        = CENTER
     ws.cell(1, 1).border           = THIN
-    for j, (l2id, part, name) in enumerate(L2_ITEMS):
+    for j, (l2id, part, name, target) in enumerate(L2_ITEMS):
         col = j + 2
         ws.cell(1, col, f"{l2id}\n{name}").font = HEADER_FONT
         ws.cell(1, col).fill       = HEADER_FILL
@@ -235,12 +226,12 @@ def build_roof(wb):
         ws.column_dimensions[get_column_letter(col)].width = 12
 
     # 数据行
-    for i, (l2id_a, _, name_a) in enumerate(L2_ITEMS):
+    for i, (l2id_a, _, name_a, _) in enumerate(L2_ITEMS):
         row = i + 2
         ws.cell(row, 1, f"{l2id_a}\n{name_a}").alignment = WRAP_TOP
         ws.cell(row, 1).border = THIN
         ws.column_dimensions['A'].width = 20
-        for j, (l2id_b, _, _) in enumerate(L2_ITEMS):
+        for j, (l2id_b, _, _, _) in enumerate(L2_ITEMS):
             col = j + 2
             cell = ws.cell(row, col)
             cell.border = THIN
