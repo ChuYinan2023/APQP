@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+@theme {
+  --color-gold: #c4a24e;
+  --color-gold-light: #e8d9a0;
+  --color-navy: #0b1d32;
+  --color-navy-deep: #060f1a;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
