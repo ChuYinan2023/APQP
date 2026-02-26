@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 驱动的 APQP 全流程协作平台</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+
+:root {
+  --navy: #0b1d32;
+  --navy-deep: #060f1a;
+  --navy-mid: #122840;
+  --navy-light: #1a3550;
+  --gold: #c4a24e;
+  --gold-light: #e8d9a0;
+  --white: #ffffff;
+  --off-white: #f7f8fa;
+  --text: #1a2030;
+  --text-light: #5a6070;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  font-family: 'Noto Sans SC', sans-serif;
+  color: var(--text);
+  background: var(--navy-deep);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══ SLIDES ═══ */
+#slides-container { width: 100%; height: 100%; position: relative; }
+
+.slide {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.7s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.7s ease;
+  will-change: transform, opacity;
+}
+
+.slide.active { transform: translateY(0);     opacity: 1; pointer-events: auto; z-index: 2; }
+.slide.above  { transform: translateY(-100%); opacity: 0; pointer-events: none; z-index: 1; }
+.slide.below  { transform: translateY(100%);  opacity: 0; pointer-events: none; z-index: 1; }
+
+/* ═══ COVER ═══ */
+.slide-cover {
+  background: var(--navy-deep);
+  text-align: center;
+  overflow: hidden;
+}
+
+.slide-cover::before {
+  content: '';
+  position: absolute;
+  top: -40%; left: -20%;
+  width: 140%; height: 180%;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(26, 74, 110, 0.18) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 30%, rgba(42, 122, 181, 0.10) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(196, 162, 78, 0.07) 0%, transparent 40%);
+  animation: drift 20s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes drift {
+  0%   { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-3%, 2%) scale(1.05); }
+}
+
+.cover-content { position: relative; z-index: 1; }
+
+.cover-line {
+  width: 60px; height: 1px;
+  background: var(--gold);
+  margin: 0 auto 2.5rem;
+}
+
+.slide-cover h1 {
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 900;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  color: #fff;
+  letter-spacing: 0.08em;
+  line-height: 1.4;
+  margin-bottom: 1.2rem;
+}
+
+.slide-cover .subtitle {
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 400;
+  font-size: clamp(1rem, 2.2vw, 1.25rem);
+  color: var(--gold-light);
+  letter-spacing: 0.15em;
+  margin-bottom: 3rem;
+}
+
+.cover-divider {
+  width: 40px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  margin: 0 auto 2rem;
+}
+
+.cover-info .company {
+  font-weight: 500; font-size: 1rem;
+  color: rgba(255,255,255,0.85);
+  letter-spacing: 0.12em;
+  margin-bottom: 0.4rem;
+}
+
+.cover-info .contact {
+  font-weight: 300; font-size: 0.85rem;
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 0.08em;
+}
+
+.cover-info .date {
+  font-weight: 300; font-size: 0.75rem;
+  color: rgba(255,255,255,0.25);
+  margin-top: 1.5rem;
+  letter-spacing: 0.1em;
+}
+
+/* ═══ CONTENT SLIDES ═══ */
+.slide-light { background: var(--off-white); }
+.slide-alt   { background: var(--white); }
+.slide-dark  { background: var(--navy); color: #fff; }
+
+.slide-inner {
+  width: 100%;
+  max-width: 960px;
+  padding: 3rem 2.5rem;
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2.2rem;
+}
+
+.section-heading .accent {
+  width: 4px; height: 32px;
+  background: var(--gold);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.section-heading h2 {
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 700;
+  font-size: 1.6rem;
+  color: var(--navy);
+  letter-spacing: 0.04em;
+}
+
+.slide-dark .section-heading h2 { color: #fff; }
+
+/* ═══ PAIN POINTS ═══ */
+.pain-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.pain-card {
+  background: #fff;
+  border-radius: 2px;
+  padding: 1.8rem 1.6rem;
+  position: relative;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  border: 1px solid rgba(0,0,0,0.04);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.pain-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.07);
+}
+
+.pain-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 3px;
+  border-radius: 2px 2px 0 0;
+  background: #c0392b;
+  opacity: 0.7;
+}
+
+.pain-card h3 {
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--navy);
+  margin-bottom: 0.6rem;
+}
+
+.pain-card p {
+  font-size: 0.92rem;
+  line-height: 1.85;
+  color: var(--text-light);
+}
+
+/* ═══ SOLUTION CARDS ═══ */
+.solution-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.solution-card {
+  background: var(--off-white);
+  border-radius: 2px;
+  padding: 1.8rem 1.6rem;
+  position: relative;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  border: 1px solid rgba(0,0,0,0.06);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.solution-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.07);
+}
+
+.solution-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 3px;
+  border-radius: 2px 2px 0 0;
+  background: var(--gold);
+}
+
+.solution-num {
+  display: inline-block;
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 900;
+  font-size: 1.8rem;
+  color: rgba(196, 162, 78, 0.2);
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.solution-card h3 {
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--navy);
+  margin-bottom: 0.6rem;
+}
+
+.solution-card p {
+  font-size: 0.92rem;
+  line-height: 1.85;
+  color: var(--text-light);
+}
+
+/* ═══ HOW LIST ═══ */
+.how-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.how-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.2rem;
+  padding: 1.6rem 1.8rem;
+  border: 1px solid rgba(196, 162, 78, 0.15);
+  border-radius: 2px;
+  background: rgba(196, 162, 78, 0.03);
+  transition: background 0.3s ease;
+}
+
+.how-item:hover {
+  background: rgba(196, 162, 78, 0.07);
+}
+
+.how-icon {
+  flex-shrink: 0;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+}
+
+.how-icon svg {
+  width: 18px; height: 18px;
+  stroke: var(--navy-deep);
+  stroke-width: 2;
+  fill: none;
+}
+
+.how-text h3 {
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--navy);
+  margin-bottom: 0.3rem;
+}
+
+.how-text p {
+  font-size: 0.92rem;
+  line-height: 1.85;
+  color: var(--text-light);
+}
+
+/* ═══ WHY NOW ═══ */
+.why-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.why-card {
+  text-align: center;
+  padding: 2rem 1.4rem;
+  border: 1px solid rgba(196, 162, 78, 0.18);
+  border-radius: 2px;
+  background: rgba(196, 162, 78, 0.04);
+  transition: all 0.3s ease;
+}
+
+.why-card:hover {
+  background: rgba(196, 162, 78, 0.1);
+  border-color: rgba(196, 162, 78, 0.35);
+  transform: translateY(-3px);
+}
+
+.why-card h3 {
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--gold-light);
+  margin-bottom: 0.8rem;
+}
+
+.why-card p {
+  font-size: 0.88rem;
+  line-height: 1.85;
+  color: rgba(255,255,255,0.55);
+}
+
+.why-intro {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 1.05rem;
+  color: rgba(255,255,255,0.5);
+  text-align: center;
+  margin-bottom: 2.5rem;
+  letter-spacing: 0.03em;
+}
+
+/* ═══ FLOW ═══ */
+.flow-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+  padding-left: 2rem;
+}
+
+.flow-wrap::before {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--gold), var(--gold-light));
+}
+
+.flow-stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1.2rem;
+  padding: 1.1rem 0;
+}
+
+.flow-stage::before {
+  content: '';
+  position: absolute;
+  left: -2rem;
+  top: 50%;
+  transform: translate(0, -50%);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--gold);
+  border: 3px solid var(--off-white);
+  z-index: 1;
+}
+
+.flow-stage + .flow-stage {
+  border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+.flow-col {
+  padding: 0.6rem 0.8rem;
+}
+
+.flow-col-header {
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-light);
+  margin-bottom: 1.2rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+
+.flow-stage-label {
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--navy);
+  margin-bottom: 0.4rem;
+}
+
+.flow-items {
+  list-style: none;
+  font-size: 0.82rem;
+  line-height: 1.75;
+  color: var(--text-light);
+}
+
+.flow-items li {
+  position: relative;
+  padding-left: 0.8rem;
+}
+
+.flow-items li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--gold);
+}
+
+.flow-items .highlight-item {
+  color: var(--navy);
+  font-weight: 500;
+}
+
+.flow-header-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1.2rem;
+  padding: 0 0 0.3rem;
+  margin-left: 0;
+  margin-bottom: 0.5rem;
+}
+
+.flow-header-cell {
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  color: var(--text-light);
+  padding: 0 0.8rem 0.5rem;
+  border-bottom: 2px solid var(--gold);
+}
+
+.flow-input {
+  text-align: center;
+  margin-bottom: 1.2rem;
+}
+
+.flow-input span {
+  display: inline-block;
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--navy);
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.08);
+  padding: 0.5rem 1.8rem;
+  border-radius: 2px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+/* ═══ CLOSING ═══ */
+.closing-block {
+  text-align: center;
+  padding: 2.8rem 2rem;
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-deep) 100%);
+  border-radius: 3px;
+  position: relative;
+  overflow: hidden;
+  margin-top: 2rem;
+}
+
+.closing-block::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background:
+    radial-gradient(ellipse at 30% 50%, rgba(196, 162, 78, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 50%, rgba(42, 122, 181, 0.06) 0%, transparent 50%);
+}
+
+.closing-block > * { position: relative; z-index: 1; }
+
+.closing-block h3 {
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 900;
+  font-size: 1.4rem;
+  color: #fff;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.7rem;
+}
+
+.closing-line {
+  width: 40px; height: 1px;
+  background: var(--gold);
+  margin: 0 auto 0.9rem;
+}
+
+.closing-block p {
+  font-size: 1rem;
+  color: var(--gold-light);
+  letter-spacing: 0.06em;
+}
+
+.progress-text {
+  font-size: 1.02rem;
+  line-height: 2;
+  color: var(--text);
+  text-align: justify;
+}
+
+.progress-text strong {
+  color: var(--navy);
+}
+
+/* ═══ NAV DOTS ═══ */
+#nav-dots {
+  position: fixed;
+  right: 2rem; top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 100;
+}
+
+.dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dot.active {
+  background: var(--gold);
+  transform: scale(1.3);
+}
+
+/* ═══ ARROWS ═══ */
+.nav-arrow {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 44px; height: 44px;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 100;
+  background: rgba(0,0,0,0.2);
+  backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
+  color: rgba(255,255,255,0.5);
+}
+
+.nav-arrow:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(0,0,0,0.35);
+}
+
+#nav-up   { top: 1.2rem; }
+#nav-down { bottom: 1.2rem; }
+
+.nav-arrow svg { width: 18px; height: 18px; }
+
+/* ═══ COUNTER ═══ */
+#slide-counter {
+  position: fixed;
+  bottom: 1.5rem; left: 2rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.22);
+  z-index: 100;
+}
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 768px) {
+  .pain-grid, .solution-grid, .why-grid {
+    grid-template-columns: 1fr;
+  }
+  .slide-inner { padding: 2rem 1.5rem; }
+  #nav-dots { right: 1rem; }
+}
+</style>
+</head>
+<body>
+
+<div id="slides-container">
+
+  <!-- SLIDE 1: COVER -->
+  <div class="slide slide-cover active" data-index="0">
+    <div class="cover-content">
+      <div class="cover-line"></div>
+      <h1>AI 驱动的 APQP 全流程协作平台</h1>
+      <p class="subtitle">把 APQP 体系真正落地</p>
+      <div class="cover-divider"></div>
+      <div class="cover-info">
+        <p class="company">智途无垠科技</p>
+        <p class="contact">Aaron &ensp;|&ensp; 18101818763</p>
+        <p class="date">2026 · 02</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2: 客户面临什么问题 -->
+  <div class="slide slide-light below" data-index="1">
+    <div class="slide-inner">
+      <div class="section-heading">
+        <div class="accent"></div>
+        <h2>客户面临什么问题</h2>
+      </div>
+      <div class="pain-grid">
+        <div class="pain-card">
+          <h3>人走经验走</h3>
+          <p>老工程师离职，APQP 怎么做没人知道，新人接不住</p>
+        </div>
+        <div class="pain-card">
+          <h3>流程靠拍脑袋</h3>
+          <p>知道该做 APQP，但没能力严格执行，跳步、漏步是常态</p>
+        </div>
+        <div class="pain-card">
+          <h3>出了事代价巨大</h3>
+          <p>召回、索赔、客户降级，一次事故可能吃掉几年利润</p>
+        </div>
+        <div class="pain-card">
+          <h3>外单进不去</h3>
+          <p>想接海外 OEM 订单，但过程能力达不到客户审核要求</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: 我们怎么解决 -->
+  <div class="slide slide-alt below" data-index="2">
+    <div class="slide-inner">
+      <div class="section-heading">
+        <div class="accent"></div>
+        <h2>我们怎么解决</h2>
+      </div>
+      <div class="solution-grid">
+        <div class="solution-card">
+          <div class="solution-num">01</div>
+          <h3>把体系固化成系统</h3>
+          <p>把 APQP 标准流程和行业最佳实践内置到 AI 中，不再依赖个别人的经验</p>
+        </div>
+        <div class="solution-card">
+          <div class="solution-num">02</div>
+          <h3>流程自带护栏</h3>
+          <p>每阶段有标准输出，有审核节点，流程自然完整，不会漏步</p>
+        </div>
+        <div class="solution-card">
+          <div class="solution-num">03</div>
+          <h3>越用越聪明</h3>
+          <p>OEM 规则、零部件经验自动积累，人走了知识还在</p>
+        </div>
+        <div class="solution-card">
+          <div class="solution-num">04</div>
+          <h3>输出即交付</h3>
+          <p>标准格式，客户审核直接拿得出东西</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: 怎么做到的 -->
+  <div class="slide slide-light below" data-index="3">
+    <div class="slide-inner">
+      <div class="section-heading">
+        <div class="accent"></div>
+        <h2>怎么做到的</h2>
+      </div>
+      <ul class="how-list">
+        <li class="how-item">
+          <div class="how-icon">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+          </div>
+          <div class="how-text">
+            <h3>行业知识内置</h3>
+            <p>APQP 体系标准和行业最佳实践内置到系统中，告诉 AI "该做什么、怎么做"</p>
+          </div>
+        </li>
+        <li class="how-item">
+          <div class="how-icon">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          </div>
+          <div class="how-text">
+            <h3>知识持续积累</h3>
+            <p>处理过的 OEM 和零部件经验留在系统里，不随人员流动而丢失</p>
+          </div>
+        </li>
+        <li class="how-item">
+          <div class="how-icon">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          </div>
+          <div class="how-text">
+            <h3>AI 自查 + 人审把关</h3>
+            <p>AI 先交叉审核验证自身输出，再分步交给人确认，双重保障</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: 为什么现在能做 -->
+  <div class="slide slide-dark below" data-index="4">
+    <div class="slide-inner">
+      <div class="section-heading" style="justify-content: center;">
+        <h2>为什么现在能做</h2>
+      </div>
+      <p class="why-intro">以前做不到，现在三个条件成熟了</p>
+      <div class="why-grid">
+        <div class="why-card">
+          <h3>AI 够聪明了</h3>
+          <p>能读懂多语言工程文档，理解行业上下文，不再是只会关键词匹配的工具</p>
+        </div>
+        <div class="why-card">
+          <h3>能执行复杂任务</h3>
+          <p>严格按照几十步的流程逐步执行，不跳步不遗漏，以前只有资深工程师能做到</p>
+        </div>
+        <div class="why-card">
+          <h3>自然语言编排</h3>
+          <p>流程用自然语言定义，不是写死的代码逻辑，适配不同客户的个性化需求非常灵活</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: 实际处理流程 -->
+  <div class="slide slide-alt below" data-index="5">
+    <div class="slide-inner" style="max-width:1040px;">
+      <div class="section-heading">
+        <div class="accent"></div>
+        <h2>实际处理流程</h2>
+      </div>
+
+      <div class="flow-input">
+        <span>OEM 规格书 PDF（英文/德文）</span>
+      </div>
+
+      <div class="flow-header-row" style="padding-left:2rem;">
+        <div class="flow-header-cell">AI 做什么</div>
+        <div class="flow-header-cell">人做什么</div>
+        <div class="flow-header-cell">产出</div>
+      </div>
+
+      <div class="flow-wrap">
+
+        <div class="flow-stage">
+          <div class="flow-col">
+            <div class="flow-stage-label">阶段1 · 文档清点</div>
+            <ul class="flow-items">
+              <li>读取全部 PDF，全文结构化存档</li>
+              <li>识别文档类型、层级与覆盖关系</li>
+              <li class="highlight-item">找出缺失文档，评估影响</li>
+              <li class="highlight-item">找出多文档间的冲突项</li>
+              <li>自查：引用覆盖是否完整</li>
+            </ul>
+          </div>
+          <div class="flow-col">
+            <ul class="flow-items" style="margin-top:1.8rem;">
+              <li>确认缺失文档：补还是不补</li>
+              <li>确认冲突项：以哪个为准</li>
+            </ul>
+          </div>
+          <div class="flow-col">
+            <ul class="flow-items" style="margin-top:1.8rem;">
+              <li>工作底稿</li>
+              <li>文档清点确认报告</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="flow-stage">
+          <div class="flow-col">
+            <div class="flow-stage-label">阶段2 · L1 工程特性</div>
+            <ul class="flow-items">
+              <li>逐章提取系统级工程特性</li>
+              <li>自动分类 C（关键）/ A（一般）</li>
+              <li class="highlight-item">标注冲突，汇总缺口</li>
+              <li>自查：特性是否提全，分类是否一致</li>
+            </ul>
+          </div>
+          <div class="flow-col">
+            <ul class="flow-items" style="margin-top:1.8rem;">
+              <li>审核特性清单</li>
+              <li>补充行业经验</li>
+            </ul>
+          </div>
+          <div class="flow-col">
+            <ul class="flow-items" style="margin-top:1.8rem;">
+              <li>L1 工程特性清单</li>
+              <li>缺口与冲突报告</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="flow-stage">
+          <div class="flow-col">
+            <div class="flow-stage-label">阶段3 · L2 零部件特性</div>
+            <ul class="flow-items">
+              <li>推断 BOM 结构树</li>
+              <li>从 L1 逐条分解到零部件级</li>
+              <li class="highlight-item">标注缺口（缺图纸、缺供应商数据）</li>
+              <li>自查：分解是否完整，有无孤立项</li>
+            </ul>
+          </div>
+          <div class="flow-col">
+            <ul class="flow-items" style="margin-top:1.8rem;">
+              <li>审核 BOM 结构</li>
+              <li>补充供应商经验</li>
+            </ul>
+          </div>
+          <div class="flow-col">
+            <ul class="flow-items" style="margin-top:1.8rem;">
+              <li>L2 零部件特性清单</li>
+              <li>缺口报告</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="flow-stage">
+          <div class="flow-col">
+            <div class="flow-stage-label">阶段4 · QFD 质量屋</div>
+            <ul class="flow-items">
+              <li class="highlight-item">构建 L1 x L2 关联矩阵</li>
+              <li class="highlight-item">标注关联强度</li>
+              <li>自查：空行、空列、覆盖率</li>
+              <li class="highlight-item">回写知识库，经验积累</li>
+            </ul>
+          </div>
+          <div class="flow-col">
+            <ul class="flow-items" style="margin-top:1.8rem;">
+              <li>审核关联关系</li>
+              <li>最终确认，用于客审</li>
+            </ul>
+          </div>
+          <div class="flow-col">
+            <ul class="flow-items" style="margin-top:1.8rem;">
+              <li>QFD 质量屋矩阵</li>
+              <li>审查结果</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 7: 现在做到什么程度 -->
+  <div class="slide slide-light below" data-index="6">
+    <div class="slide-inner">
+      <div class="section-heading">
+        <div class="accent"></div>
+        <h2>现在做到什么程度</h2>
+      </div>
+      <p class="progress-text">
+        已跑通第一个模块：从 <strong>OEM 规格书</strong>到<strong>工程特性清单</strong>和 <strong>QFD 矩阵</strong>的完整输出。后续模块（FMEA、控制计划、PPAP）按规划逐步扩展。
+      </p>
+      <div class="closing-block">
+        <h3>不是"帮你快"，是"帮你做得到"</h3>
+        <div class="closing-line"></div>
+        <p>AI 驱动的 APQP 全流程协作平台</p>
+      </div>
+      <p style="text-align:center; margin-top: 2.5rem; font-size: 0.75rem; color: var(--text-light); letter-spacing: 0.1em;">
+        智途无垠科技 &ensp;·&ensp; Aaron &ensp;·&ensp; 18101818763
+      </p>
+    </div>
+  </div>
+
+</div>
+
+<!-- Navigation Dots -->
+<div id="nav-dots">
+  <div class="dot active" data-target="0"></div>
+  <div class="dot" data-target="1"></div>
+  <div class="dot" data-target="2"></div>
+  <div class="dot" data-target="3"></div>
+  <div class="dot" data-target="4"></div>
+  <div class="dot" data-target="5"></div>
+  <div class="dot" data-target="6"></div>
+</div>
+
+<!-- Arrow buttons -->
+<div class="nav-arrow" id="nav-up" title="上一页">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="18 15 12 9 6 15"></polyline>
+  </svg>
+</div>
+<div class="nav-arrow" id="nav-down" title="下一页">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="6 9 12 15 18 9"></polyline>
+  </svg>
+</div>
+
+<div id="slide-counter">01 / 07</div>
+
+<script>
+(function () {
+  const TOTAL = 7;
+  let current = 0;
+  let animating = false;
+
+  const slides  = document.querySelectorAll('.slide');
+  const dots    = document.querySelectorAll('.dot');
+  const counter = document.getElementById('slide-counter');
+  const navUp   = document.getElementById('nav-up');
+  const navDown = document.getElementById('nav-down');
+
+  function goTo(index) {
+    if (animating || index === current || index < 0 || index >= TOTAL) return;
+    animating = true;
+
+    const dir = index > current ? 1 : -1;
+
+    slides[current].classList.remove('active');
+    slides[current].classList.add(dir > 0 ? 'above' : 'below');
+
+    slides[index].classList.remove(dir > 0 ? 'below' : 'above');
+    slides[index].classList.add('active');
+
+    dots[current].classList.remove('active');
+    dots[index].classList.add('active');
+
+    counter.textContent =
+      String(index + 1).padStart(2, '0') + ' / ' +
+      String(TOTAL).padStart(2, '0');
+
+    current = index;
+
+    navUp.style.opacity   = current === 0         ? '0.2' : '1';
+    navDown.style.opacity = current === TOTAL - 1 ? '0.2' : '1';
+
+    setTimeout(() => { animating = false; }, 750);
+  }
+
+  navUp.style.opacity = '0.2';
+
+  dots.forEach(dot => {
+    dot.addEventListener('click', () => goTo(+dot.dataset.target));
+  });
+
+  navUp.addEventListener('click',   () => goTo(current - 1));
+  navDown.addEventListener('click', () => goTo(current + 1));
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ')  { e.preventDefault(); goTo(current + 1); }
+    if (e.key === 'ArrowUp'   || e.key === 'PageUp')                     { e.preventDefault(); goTo(current - 1); }
+  });
+
+  let wheelTimer = null;
+  document.addEventListener('wheel', e => {
+    e.preventDefault();
+    if (wheelTimer) return;
+    goTo(e.deltaY > 0 ? current + 1 : current - 1);
+    wheelTimer = setTimeout(() => { wheelTimer = null; }, 900);
+  }, { passive: false });
+
+  let touchStartY = 0;
+  document.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, { passive: true });
+  document.addEventListener('touchend',   e => {
+    const dy = touchStartY - e.changedTouches[0].clientY;
+    if (Math.abs(dy) > 50) goTo(dy > 0 ? current + 1 : current - 1);
+  }, { passive: true });
+})();
+</script>
+
+</body>
+</html>
