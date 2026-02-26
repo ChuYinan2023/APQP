@@ -319,6 +319,64 @@ html, body {
   color: var(--text-light);
 }
 
+/* ═══ TECH GRID ═══ */
+.tech-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+}
+
+.tech-card {
+  background: #fff;
+  border-radius: 2px;
+  padding: 1.5rem 1.4rem;
+  position: relative;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  border: 1px solid rgba(0,0,0,0.04);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tech-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.07);
+}
+
+.tech-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 3px;
+  border-radius: 2px 2px 0 0;
+  background: var(--gold);
+}
+
+.tech-card-wide {
+  grid-column: 1 / -1;
+}
+
+.tech-num {
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 900;
+  font-size: 1.6rem;
+  color: rgba(196, 162, 78, 0.2);
+  line-height: 1;
+  margin-bottom: 0.4rem;
+}
+
+.tech-card h3 {
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--navy);
+  margin-bottom: 0.5rem;
+}
+
+.tech-card p {
+  font-size: 0.9rem;
+  line-height: 1.8;
+  color: var(--text-light);
+}
+
 /* ═══ WHY NOW ═══ */
 .why-grid {
   display: grid;
@@ -707,69 +765,43 @@ html, body {
 
   <!-- SLIDE 4: 怎么做到的 -->
   <div class="slide slide-light below" data-index="3">
-    <div class="slide-inner">
+    <div class="slide-inner" style="max-width:1040px;">
       <div class="section-heading">
         <div class="accent"></div>
         <h2>怎么做到的</h2>
       </div>
-      <ul class="how-list">
-        <li class="how-item">
-          <div class="how-icon">
-            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-          </div>
-          <div class="how-text">
-            <h3>行业知识内置</h3>
-            <p>APQP 体系标准和行业最佳实践内置到系统中，告诉 AI "该做什么、怎么做"</p>
-          </div>
-        </li>
-        <li class="how-item">
-          <div class="how-icon">
-            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-          </div>
-          <div class="how-text">
-            <h3>知识持续积累</h3>
-            <p>处理过的 OEM 和零部件经验留在系统里，不随人员流动而丢失</p>
-          </div>
-        </li>
-        <li class="how-item">
-          <div class="how-icon">
-            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-          </div>
-          <div class="how-text">
-            <h3>AI 自查 + 人审把关</h3>
-            <p>AI 先交叉审核验证自身输出，再分步交给人确认，双重保障</p>
-          </div>
-        </li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- SLIDE 5: 为什么现在能做 -->
-  <div class="slide slide-dark below" data-index="4">
-    <div class="slide-inner">
-      <div class="section-heading" style="justify-content: center;">
-        <h2>为什么现在能做</h2>
-      </div>
-      <p class="why-intro">以前做不到，现在三个条件成熟了</p>
-      <div class="why-grid">
-        <div class="why-card">
-          <h3>AI 够聪明了</h3>
-          <p>能读懂多语言工程文档，理解行业上下文，不再是只会关键词匹配的工具</p>
+      <div class="tech-grid">
+        <div class="tech-card">
+          <div class="tech-num">01</div>
+          <h3>LLM 自然语言理解</h3>
+          <p>能读懂多语言工程文档，理解行业上下文，提取结构化信息</p>
         </div>
-        <div class="why-card">
-          <h3>能执行复杂任务</h3>
-          <p>严格按照几十步的流程逐步执行，不跳步不遗漏，以前只有资深工程师能做到</p>
+        <div class="tech-card">
+          <div class="tech-num">02</div>
+          <h3>Agentic 任务编排</h3>
+          <p>智能的复杂任务编排调度，让 AI 严格按几十步流程逐步执行，不跳步不遗漏</p>
         </div>
-        <div class="why-card">
-          <h3>自然语言编排</h3>
-          <p>流程用自然语言定义，不是写死的代码逻辑，适配不同客户的个性化需求非常灵活</p>
+        <div class="tech-card">
+          <div class="tech-num">03</div>
+          <h3>MCP 外部工具对接</h3>
+          <p>AI 能调用各类专业工具，PDF 解析、Excel 生成、数据校验等，能力可持续扩展</p>
+        </div>
+        <div class="tech-card">
+          <div class="tech-num">04</div>
+          <h3>Skill 垂直知识加载</h3>
+          <p>轻松加载 APQP 体系标准、OEM 规则、零部件经验，让通用 AI 变成行业专家</p>
+        </div>
+        <div class="tech-card tech-card-wide">
+          <div class="tech-num">05</div>
+          <h3>AI Coding 自进化</h3>
+          <p>AI 具备编程能力，能自己写脚本、改规则、积累知识，越用越聪明不是口号，是真的在自我迭代</p>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- SLIDE 6: 实际处理流程 -->
-  <div class="slide slide-alt below" data-index="5">
+  <!-- SLIDE 5: 实际处理流程 -->
+  <div class="slide slide-alt below" data-index="4">
     <div class="slide-inner" style="max-width:1040px;">
       <div class="section-heading">
         <div class="accent"></div>
@@ -889,8 +921,8 @@ html, body {
     </div>
   </div>
 
-  <!-- SLIDE 7: 现在做到什么程度 -->
-  <div class="slide slide-light below" data-index="6">
+  <!-- SLIDE 6: 现在做到什么程度 -->
+  <div class="slide slide-light below" data-index="5">
     <div class="slide-inner">
       <div class="section-heading">
         <div class="accent"></div>
@@ -920,7 +952,6 @@ html, body {
   <div class="dot" data-target="3"></div>
   <div class="dot" data-target="4"></div>
   <div class="dot" data-target="5"></div>
-  <div class="dot" data-target="6"></div>
 </div>
 
 <!-- Arrow buttons -->
@@ -935,11 +966,11 @@ html, body {
   </svg>
 </div>
 
-<div id="slide-counter">01 / 07</div>
+<div id="slide-counter">01 / 06</div>
 
 <script>
 (function () {
-  const TOTAL = 7;
+  const TOTAL = 6;
   let current = 0;
   let animating = false;
 
