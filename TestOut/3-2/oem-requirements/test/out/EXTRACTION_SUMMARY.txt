@@ -1,0 +1,241 @@
+================================================================================
+KP1_CTS_零部件技术规范 - EXTRACTION SUMMARY
+Component: Fuel supply line (KP1 A&B Program)
+Document Release: 00 (Mar.09, 2022)
+Extraction Date: 2026-03-01
+================================================================================
+
+CRITICAL FINDINGS:
+================================================================================
+
+1. NICKEL PLATING REQUIREMENT FOR METALLIC TUBES (CRITICAL)
+   ────────────────────────────────────────────────────────
+   Requirement: "Metallic pipe is required internal nickel plate treatment"
+   Standard: PF.90197 section 5
+   Applies to: ALL metallic fuel tubes/pipes
+   Mandatory: YES
+   Status: CRITICAL - must be included in all designs
+
+2. PROTECTION CAP REQUIREMENT (CRITICAL)
+   ────────────────────────────────────────
+   Requirement: "Protection caps are requested on all hose extremities
+                (plastic, rubber or metal)"
+   Applies to: ALL hose extremities
+   Cap Materials: Plastic, rubber, or metal
+   Mandatory: YES (but can be eliminated with specific agreements)
+   Exceptions: Only with agreement from:
+              - Plant UTE
+              - STELLANTIS Quality dept
+   Design: Caps must be shaped according to specific criteria
+   Transport: Conditions must be shared with Manufacturing Engineering dept
+   Status: CRITICAL - standard requirement on all deliveries
+
+
+CHAPTER 3 TECHNICAL SPECIFICATIONS:
+================================================================================
+
+Section 3.1 - Performance
+  • Metallic pipe internal nickel plate treatment (PF.90197 sec 5)
+
+Section 3.2 - Environmental Requirements
+  • Material compliance: STELLANTIS CS-9003 (MANDATORY)
+  • Recyclability calculation: STELLANTIS 00256 (green list)
+  • Marking: STELLANTIS 07416
+  • VOC/Odor requirements: MS-AO-0001 (v2.1, 2018-9-12)
+  • Material data submission: IMDS system (MANDATORY for production approval)
+
+Section 3.3 - Appearance/Physical/Mechanical/Electrical Requirements
+  • Standard: PF.90197 section 6
+  • Includes: Visual inspection, dimensional tolerance, material properties,
+             electrical properties
+
+Section 3.4 - Functional Requirements
+  • Standard: PF.90197 section 7
+  • Quick connector: PF.90298 / SAE J2044
+  • Rubber seals: 9.14618
+  • Steel pipes: 9.02145/02
+
+Section 3.5 - Safety and Regulatory Requirements
+  • Standard: PF.90197 section 8
+  • EC (European Community) compliance
+  • ECE (Economic Commission Europe) compliance
+
+Section 3.6 - Reliability/Durability Requirements
+  • Standard: PF.90197 section 9
+  • Long-term performance under operating conditions
+
+Section 3.7 - Component Protection
+  • Protection caps on ALL hose extremities (plastic, rubber, metal)
+  • Can only be eliminated with specific agreement
+
+
+CHAPTER 4 VALIDATION REQUIREMENTS:
+================================================================================
+
+Mandatory Deliverables:
+  1. ONE Design Validation (DV) Plan per component
+     Format: STELLANTIS norm 07740 annex 2
+     Reference: Annex A - PF.90197
+
+  2. ONE Production Validation (PV / AQF) Plan per component
+     Format: STELLANTIS norm 07740 annex 2
+     Reference: Annex A - PF.90197
+
+Testing Guidelines:
+  • All tests per STELLANTIS specifications must be listed
+  • All tests must be present in plan (even if not executed)
+  • If not performing test in DV: write reason in NOTE column, color line grey
+  • If extending test from DV to PV: document in NOTE column, color line grey
+  • Requalification tests in PV: Mandatory per STELLANTIS SPC 07740
+  • Complement components (ICV, etc.): Must provide DV and PV plans
+
+Standards for Validation:
+  • Qualification procedure: STELLANTIS 07740
+  • Format reference: STELLANTIS 07740 annex 2
+
+
+PRIMARY STANDARDS AND SPECIFICATIONS:
+================================================================================
+
+MAIN TECHNICAL SPECIFICATION
+  PF.90197 - Fuel bundle and fuel system jumpers (plastic, rubber, metallic)
+    Section 5: Environmental requirements
+    Section 6: Appearance/Physical/Mechanical/Electrical requirements
+    Section 7: Functional requirements
+    Section 8: Safety and regulatory requirements
+    Section 9: Reliability/Durability requirements
+    Annex A: Detailed validation test matrix
+
+INTERFACE STANDARDS
+  PF.90298 - Quick connect - fuel system (also SAE J2044)
+  SAE J2044 - Quick Connector standard
+
+MATERIAL STANDARDS
+  Plastics:
+    MS.50017 - Polyamide (nylon) - harmonized 2 in 1
+    9.55253 - Miscellaneous plastic component
+  Elastomers:
+    MS.50015 - Thermoplastic vulcanizates - EPDM/PP - harmonized 2 in 1
+    9.14618 - Rubber o-rings seals
+  Metals:
+    9.02145/02 - Electrowelded steel pipes for fuel circuits
+  Protective sleeves:
+    PF.90271 - Electrical system insulating components, wiring harness protection
+
+ENVIRONMENTAL AND MATERIAL COMPLIANCE
+  CS-9003 - Restricted and Prohibited Substances (MANDATORY)
+  07416 - Recycling markings for plastic, composite and elastomer components
+  00256 - Recyclability and recoverability of a vehicle (green list)
+  MS-AO-0001 - VOC, Odor and Prohibited Substances (v2.1, 2018-9-12)
+  IMDS - Material data sheet system (MANDATORY for production approval)
+
+QUALITY AND PROCESS STANDARDS
+  9.01102 - Supplier Quality
+  9.01103 - Product quality and conformity certificate
+  07740 - Qualification procedure
+  00270 / CS.00133 - Product FMEA
+  00271 - Process FMEA
+  07610 - Supplier code
+  07611 - Supplier alphanumeric code marking
+  08034 - Integration level of product procedure
+  QR-00001 - Global product assurance testing (GPAT)
+
+MARKING STANDARDS
+  0.00013 - Procedure for vehicle part marking
+  CS.11000 - Motor Vehicle Part Marking "sol. F" / MOPAR LOGO
+  9.01111 - Ergonomics
+
+CAD AND DRAWING STANDARDS
+  CS.00080 - CAD drawings, CAD modelling/drawings rules
+  CS.00029 - 3DA documentation definition (3D Annotated Models)
+  CS.00003 - New drawing title block definitions and completion rules
+  07264 - CAD drawings types and sides of lines and characters
+  07226 - TcAE system and CAD part management
+  07247 - CAD drawings self-certification of quality
+  07247/01 - CAD drawings self-certification for E&D
+  07265 - CAD drawings library symbols
+  01366/01 - Graphic symbols on drawings
+  01376/02 - Symbols on technical drawings (geometrical tolerances)
+  ASME Y14.5-2009 - Dimensioning and tolerancing
+  CS.00019 - Geometric dimensioning and tolerancing (ASME addendum)
+
+PACKAGE SPECIFICATION
+  PRO.00004 - STELLANTIS Package Specification (CAD model changes compliance)
+
+
+SPECIAL REQUIREMENTS:
+================================================================================
+
+MATERIAL REQUIREMENTS
+  • All materials must comply with STELLANTIS CS-9003 (MANDATORY)
+  • Materials should be recyclable as much as possible
+  • Recyclability calculated per STELLANTIS 00256 (green list)
+  • Material alternatives evaluated by STELLANTIS during sourcing
+  • Supplier must use IMDS system for material recyclability
+  • Production approval ONLY after STELLANTIS receives material data via IMDS
+  • Flagged criticalities must be reported to Material dept
+
+CAD AND DESIGN REQUIREMENTS
+  • CAD drawing standard compliance with §2.4.3 requirements
+  • Latest UG/Teamcenter version (STELLANTIS standard)
+  • All geometry changes per STELLANTIS Package Specification PRO.00004
+  • Supplier must maintain STELLANTIS Package Team Requirements alignment
+  • Self-certification of CAD parts quality per spec 07247
+
+PACKAGE AND CONFIGURATION
+  • Must comply with STELLANTIS Package Specification PRO.00004
+  • All changes to CAD model must be fully documented
+  • Supplier must share Package Team Requirements through all development phases
+
+
+SUPPLIER QUALITY REQUIREMENTS:
+================================================================================
+  • Product FMEA (00270 / CS.00133)
+  • Process FMEA (00271)
+  • Supplier code registration (07610)
+  • Product quality and conformity certificate (9.01103)
+  • Supplier alphanumeric code marking (07611)
+  • DV plan (per STELLANTIS 07740 annex 2)
+  • PV plan (per STELLANTIS 07740 annex 2)
+  • Material data sheet via IMDS system (MANDATORY)
+
+
+CONFLICT RESOLUTION:
+================================================================================
+Order of Precedence:
+  1. This specification (KP1_CTS) text
+  2. STELLANTIS specifications cited (highest requirements apply in conflicts)
+  3. Government laws and regulations (unless specific exemption obtained)
+
+
+KEY REFERENCE DOCUMENTS:
+================================================================================
+  • Annex A - PF.90197 contains detailed validation test matrix
+  • STELLANTIS norm 07740 annex 2 contains DV/PV plan format
+  • STELLANTIS Package Specification PRO.00004 (geometry changes)
+
+
+EXTRACTED DATA FILES:
+================================================================================
+Generated extraction files at:
+  /home/chu2026/Documents/github/APQP/docs/emma/oem-requirements/test/
+
+1. KP1_CTS_EXTRACTION.md - Comprehensive markdown document
+2. KP1_CTS_REQUIREMENTS.json - Machine-readable JSON format
+3. EXTRACTION_SUMMARY.txt - This file (text summary)
+
+
+DOCUMENT METADATA:
+================================================================================
+Title: Component Technical Specification (CTS) - Fuel supply line
+Program: STELLANTIS PROGRAM KP1 A&B
+Component: Fuel supply line (filter to engine)
+Release: 00
+Release Date: Mar.09, 2022
+Total Paragraphs: 188
+Total Tables: 6
+Source File: KP1_CTS_零部件技术规范.docx
+Extraction Date: 2026-03-01
+Extraction Method: python-docx library
+================================================================================
+

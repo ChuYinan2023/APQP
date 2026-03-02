@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APQP Dynamic Matrix</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #232734;
+    --border: #2e3345;
+    --text: #e2e4eb;
+    --text-dim: #8b90a0;
+    --text-muted: #5a5f73;
+    --accent: #4f8ff7;
+    --accent-dim: #2a4a8a;
+
+    /* Maturity colors */
+    --m0: #1a1d27;
+    --m1: #1e3a2a;
+    --m1-text: #4ade80;
+    --m2: #2a3d1e;
+    --m2-text: #a3e635;
+    --m3: #3d3a1e;
+    --m3-text: #facc15;
+    --m4: #3d2a1e;
+    --m4-text: #fb923c;
+    --m5: #2a1e3d;
+    --m5-text: #c084fc;
+
+    /* Dependency colors */
+    --dep-drives: #4f8ff7;
+    --dep-informs: #a78bfa;
+    --dep-constrains: #f97316;
+    --dep-validates: #22d3ee;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: auto;
+  }
+
+  .header {
+    padding: 28px 32px 12px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 100;
+  }
+
+  .header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+  }
+
+  .header p {
+    font-size: 13px;
+    color: var(--text-dim);
+    max-width: 800px;
+    line-height: 1.5;
+  }
+
+  .controls {
+    display: flex;
+    gap: 12px;
+    padding: 14px 32px;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    align-items: center;
+    position: sticky;
+    top: 82px;
+    background: var(--bg);
+    z-index: 99;
+  }
+
+  .controls label {
+    font-size: 12px;
+    color: var(--text-dim);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .toggle-group {
+    display: flex;
+    gap: 2px;
+    background: var(--surface);
+    border-radius: 6px;
+    padding: 2px;
+    border: 1px solid var(--border);
+  }
+
+  .toggle-btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 12px;
+    border: none;
+    background: transparent;
+    color: var(--text-dim);
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.15s;
+  }
+
+  .toggle-btn.active {
+    background: var(--accent-dim);
+    color: var(--accent);
+  }
+
+  .toggle-btn:hover:not(.active) {
+    color: var(--text);
+  }
+
+  .legend {
+    display: flex;
+    gap: 16px;
+    margin-left: auto;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+  }
+
+  .matrix-container {
+    padding: 24px 32px;
+    overflow-x: auto;
+  }
+
+  table {
+    border-collapse: separate;
+    border-spacing: 2px;
+    width: 100%;
+    min-width: 1100px;
+  }
+
+  th {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 10px 12px;
+    text-align: center;
+    color: var(--text-dim);
+    background: var(--surface);
+    position: sticky;
+    top: 130px;
+    z-index: 10;
+  }
+
+  th.gate-header {
+    min-width: 130px;
+  }
+
+  th.deliverable-header {
+    text-align: left;
+    min-width: 220px;
+    position: sticky;
+    left: 0;
+    z-index: 20;
+  }
+
+  th.category-header {
+    text-align: left;
+    background: var(--surface2);
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 8px 12px;
+    position: sticky;
+    left: 0;
+    z-index: 15;
+  }
+
+  td.category-row {
+    background: var(--surface2);
+    height: 4px;
+    padding: 0;
+  }
+
+  tr.deliverable-row td:first-child {
+    text-align: left;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 8px 12px;
+    background: var(--surface);
+    position: sticky;
+    left: 0;
+    z-index: 5;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  tr.deliverable-row td:first-child:hover {
+    background: var(--surface2);
+  }
+
+  .cell {
+    padding: 6px 8px;
+    text-align: center;
+    background: var(--surface);
+    cursor: pointer;
+    transition: all 0.12s;
+    position: relative;
+    min-height: 44px;
+    vertical-align: middle;
+  }
+
+  .cell:hover {
+    outline: 1px solid var(--accent);
+    z-index: 2;
+  }
+
+  .cell.highlighted {
+    outline: 2px solid var(--accent);
+    z-index: 3;
+  }
+
+  .cell.dep-highlighted {
+    outline: 2px dashed var(--dep-drives);
+    z-index: 3;
+  }
+
+  .maturity-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 3px;
+    min-width: 24px;
+  }
+
+  .maturity-label {
+    display: block;
+    font-size: 9px;
+    color: var(--text-muted);
+    margin-top: 2px;
+    line-height: 1.2;
+  }
+
+  .m-none { background: transparent; }
+  .m-initiate { background: var(--m1); color: var(--m1-text); }
+  .m-draft { background: var(--m2); color: var(--m2-text); }
+  .m-refine { background: var(--m3); color: var(--m3-text); }
+  .m-validate { background: var(--m4); color: var(--m4-text); }
+  .m-sustain { background: var(--m5); color: var(--m5-text); }
+
+  .empty-cell {
+    color: var(--text-muted);
+    font-size: 16px;
+  }
+
+  /* Detail panel */
+  .detail-panel {
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 380px;
+    height: 100vh;
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    z-index: 200;
+    transform: translateX(100%);
+    transition: transform 0.2s ease;
+    overflow-y: auto;
+    padding: 24px;
+  }
+
+  .detail-panel.open {
+    transform: translateX(0);
+  }
+
+  .detail-panel h2 {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .detail-panel h3 {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+    margin: 16px 0 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .detail-panel p, .detail-panel li {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-dim);
+  }
+
+  .detail-panel ul {
+    padding-left: 16px;
+  }
+
+  .detail-panel li {
+    margin-bottom: 4px;
+  }
+
+  .detail-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    font-size: 18px;
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+
+  .detail-close:hover {
+    background: var(--surface2);
+    color: var(--text);
+  }
+
+  .dep-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 3px;
+    margin: 2px;
+    background: var(--surface2);
+    color: var(--text-dim);
+    cursor: pointer;
+  }
+
+  .dep-tag:hover {
+    color: var(--text);
+  }
+
+  .dep-tag .dep-arrow {
+    font-size: 9px;
+  }
+
+  .dep-tag.drives { border-left: 2px solid var(--dep-drives); }
+  .dep-tag.informs { border-left: 2px solid var(--dep-informs); }
+  .dep-tag.constrains { border-left: 2px solid var(--dep-constrains); }
+  .dep-tag.validates { border-left: 2px solid var(--dep-validates); }
+
+  .phase-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+  }
+
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.3);
+    z-index: 199;
+    display: none;
+  }
+
+  .overlay.open { display: block; }
+
+  .dep-line {
+    position: absolute;
+    pointer-events: none;
+    z-index: 50;
+  }
+
+  /* View mode: dependencies overlay */
+  .dep-overlay {
+    display: none;
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 20px;
+    z-index: 90;
+    font-size: 12px;
+    color: var(--text-dim);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+
+  .dep-overlay.visible { display: block; }
+
+  .no-scroll { overflow: hidden; }
+
+  @media (max-width: 600px) {
+    .header { padding: 16px; }
+    .controls { padding: 10px 16px; }
+    .matrix-container { padding: 12px 16px; }
+    .detail-panel { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>APQP Dynamic Matrix</h1>
+  <p>Deliverables × Phase Gates. Each cell shows the maturity level of that deliverable at that gate. Click any cell to see details and interdependencies. Deliverables mature progressively — they are reviewed at multiple gates, not produced once.</p>
+</div>
+
+<div class="controls">
+  <label>View:</label>
+  <div class="toggle-group">
+    <button class="toggle-btn active" onclick="setView('maturity')">Maturity Levels</button>
+    <button class="toggle-btn" onclick="setView('dependencies')">Dependencies</button>
+  </div>
+
+  <div class="legend" id="maturityLegend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--m1);border:1px solid var(--m1-text)"></div> Initiate</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--m2);border:1px solid var(--m2-text)"></div> Draft</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--m3);border:1px solid var(--m3-text)"></div> Refine</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--m4);border:1px solid var(--m4-text)"></div> Validate</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--m5);border:1px solid var(--m5-text)"></div> Sustain</div>
+  </div>
+  <div class="legend" id="depLegend" style="display:none">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--dep-drives)"></div> Drives</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--dep-informs)"></div> Informs</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--dep-constrains)"></div> Constrains</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--dep-validates)"></div> Validates</div>
+  </div>
+</div>
+
+<div class="matrix-container">
+  <table id="matrixTable"></table>
+</div>
+
+<div class="overlay" id="overlay" onclick="closePanel()"></div>
+<div class="detail-panel" id="detailPanel">
+  <button class="detail-close" onclick="closePanel()">✕</button>
+  <div id="detailContent"></div>
+</div>
+
+<div class="dep-overlay" id="depOverlay">Click any deliverable name to see its dependency network</div>
+
+<script>
+const GATES = [
+  { id: 'G0', name: 'Program Approval', phase: 'Phase 1: Plan & Define' },
+  { id: 'G1', name: 'Design Approval', phase: 'Phase 2: Product Design' },
+  { id: 'G2', name: 'Process Approval', phase: 'Phase 3: Process Design' },
+  { id: 'G3', name: 'Production Trial', phase: 'Phase 4: Validation' },
+  { id: 'G4', name: 'Launch & Sustain', phase: 'Phase 5: Feedback' },
+];
+
+// Maturity levels: 0=none, I=Initiate, D=Draft, R=Refine, V=Validate, S=Sustain
+const M = { _:'', I:'Initiate', D:'Draft', R:'Refine', V:'Validate', S:'Sustain' };
+
+const CATEGORIES = [
+  {
+    name: 'Voice of Customer & Planning',
+    deliverables: [
+      {
+        id: 'VOC',
+        name: 'Voice of Customer (VOC)',
+        gates: ['D','R','R','V','S'],
+        desc: 'Customer needs, wants, expectations gathered from market research, warranty data, complaints, benchmarking, and direct customer input.',
+        gateNotes: {
+          G0: 'Initial VOC gathered from market research, customer interviews, warranty history, competitor analysis. Structured into needs/wants.',
+          G1: 'Refined with customer feedback on concept designs and early prototypes. Gaps identified.',
+          G2: 'Reviewed against process capabilities. Any VOC items at risk due to process limitations flagged.',
+          G3: 'Validated against pilot production output. Customer samples evaluated.',
+          G4: 'Living document. Updated continuously with field data, warranty claims, new customer input for next program.',
+        },
+      },
+      {
+        id: 'BPC',
+        name: 'Business Plan / Case',
+        gates: ['D','R','V','V','S'],
+        desc: 'Market opportunity, target cost, volume assumptions, timing, investment requirements, ROI.',
+        gateNotes: {
+          G0: 'Initial business case with market sizing, target pricing, volume forecast, high-level cost estimate.',
+          G1: 'Updated with design-driven cost estimates, tooling investment, development costs.',
+          G2: 'Validated with manufacturing cost model, piece price, capital expenditure confirmed.',
+          G3: 'Final validation against actual pilot costs, yield, cycle times.',
+          G4: 'Tracked against actuals. Feeds lessons learned to next business case.',
+        },
+      },
+      {
+        id: 'PRG',
+        name: 'Product Assurance Plan / Timing',
+        gates: ['D','R','R','V','S'],
+        desc: 'Master program timing chart. Milestone dates, resource plan, risk register, open issues list.',
+        gateNotes: {
+          G0: 'Master timing established. Key milestones, resource allocation, high-level risk identification.',
+          G1: 'Refined with detailed engineering and test milestones. Design risks quantified.',
+          G2: 'Refined with process development, tooling, and facility milestones. Critical path confirmed.',
+          G3: 'Validated — all milestones met or dispositioned. Launch readiness confirmed.',
+          G4: 'Lessons learned on timing accuracy captured for future programs.',
+        },
+      },
+      {
+        id: 'DRG',
+        name: 'Design & Reliability Goals',
+        gates: ['D','R','V','V','S'],
+        desc: 'Quantified performance, durability, and reliability targets derived from VOC, benchmarking, and regulatory requirements.',
+        gateNotes: {
+          G0: 'Targets set based on VOC, benchmarks, regulations. May include MTBF, warranty targets, performance specs.',
+          G1: 'Refined and decomposed to subsystem/component level. Test methods defined.',
+          G2: 'Confirmed achievable given process capabilities.',
+          G3: 'Validated by DVP&R test results on production-intent parts.',
+          G4: 'Tracked against field performance. Goals updated for next generation.',
+        },
+      },
+    ]
+  },
+  {
+    name: 'Product Design & Engineering',
+    deliverables: [
+      {
+        id: 'BOM',
+        name: 'Bill of Materials (BOM)',
+        gates: ['I','D','R','V','S'],
+        desc: 'Complete hierarchical list of all parts, materials, and components that make up the product.',
+        gateNotes: {
+          G0: 'Preliminary — major assemblies and known components identified. Many TBDs.',
+          G1: 'Detailed BOM with part numbers, materials, suppliers identified. Engineering release.',
+          G2: 'Refined with manufacturing input — packaging, consumables, tooling. Sourced and costed.',
+          G3: 'Validated — all parts available, received, inspected. BOM matches production reality.',
+          G4: 'Maintained. ECNs tracked. Feeds next-gen BOM.',
+        },
+      },
+      {
+        id: 'DWG',
+        name: 'Engineering Drawings & Specs',
+        gates: ['I','D','V','V','S'],
+        desc: 'Formal 2D drawings, 3D models, GD&T, material specs, performance specs. The legal definition of the product.',
+        gateNotes: {
+          G0: 'Concept-level layouts and sketches. Key interfaces identified.',
+          G1: 'Full detailed drawings with GD&T, material callouts, special characteristics identified. Released for prototype.',
+          G2: 'Validated for manufacturability. Any DFM-driven changes incorporated via ECN.',
+          G3: 'Final released drawings matching production parts. Dimensional reports confirm conformance.',
+          G4: 'Living documents. Updated via ECN process based on field issues or improvements.',
+        },
+      },
+      {
+        id: 'DFMEA',
+        name: 'Design FMEA (DFMEA)',
+        gates: ['I','D','R','V','S'],
+        desc: 'Systematic analysis of potential design failure modes, their effects, causes, and current/planned controls.',
+        gateNotes: {
+          G0: 'Initiated — high-level failure modes from previous programs and known risks.',
+          G1: 'Detailed DFMEA completed for all functions/interfaces. RPN scores calculated. High-RPNs have action plans.',
+          G2: 'Refined — manufacturing input added. Special characteristics confirmed. Actions verified effective.',
+          G3: 'Validated — test results confirm failure modes are controlled. RPNs re-scored with actual detection methods.',
+          G4: 'Living document. Updated with field failure modes. Feeds next-gen DFMEA.',
+        },
+      },
+      {
+        id: 'DVPR',
+        name: 'Design Verification Plan & Report (DVP&R)',
+        gates: ['_','D','R','V','S'],
+        desc: 'The test plan and results matrix. Every requirement mapped to a test method, sample size, acceptance criteria, and results.',
+        gateNotes: {
+          G0: '',
+          G1: 'Plan created — all design requirements mapped to test methods, sample sizes, timing. Prototype tests initiated.',
+          G2: 'Refined with process-related tests. Results from prototype testing recorded. Open failures tracked.',
+          G3: 'Validated — all tests completed on production-intent parts. All results recorded. Failures dispositioned.',
+          G4: 'Final report. Feeds reliability database and next-gen test plan.',
+        },
+      },
+      {
+        id: 'SC',
+        name: 'Special Characteristics',
+        gates: ['I','D','R','V','S'],
+        desc: 'Product and process characteristics that affect safety, regulatory compliance, fit, function, or appearance — requiring special controls.',
+        gateNotes: {
+          G0: 'Preliminary list from customer requirements, regulations, and known critical features.',
+          G1: 'Defined on drawings with symbols. Linked to DFMEA high-severity items.',
+          G2: 'Flowed into PFMEA, control plan, and work instructions. Process controls defined for each.',
+          G3: 'Validated — capability studies (Cpk) confirm process can hold special characteristics.',
+          G4: 'Monitored in production SPC. Updated based on field issues.',
+        },
+      },
+    ]
+  },
+  {
+    name: 'Process Design & Manufacturing',
+    deliverables: [
+      {
+        id: 'PFC',
+        name: 'Process Flow Chart',
+        gates: ['_','I','D','V','S'],
+        desc: 'Visual map of every manufacturing step from receiving through shipping, including inspections, rework loops, and decision points.',
+        gateNotes: {
+          G0: '',
+          G1: 'Initiated — high-level process concept based on similar products.',
+          G2: 'Detailed flow with all operations, inspections, transport, storage. Linked to PFMEA and control plan.',
+          G3: 'Validated against actual pilot production. Matches reality on the floor.',
+          G4: 'Updated for process improvements and line rebalancing.',
+        },
+      },
+      {
+        id: 'PFMEA',
+        name: 'Process FMEA (PFMEA)',
+        gates: ['_','I','D','V','S'],
+        desc: 'Systematic analysis of potential process failure modes at each operation in the process flow.',
+        gateNotes: {
+          G0: '',
+          G1: 'Initiated — leveraging lessons learned from similar processes. High-level risks identified.',
+          G2: 'Detailed PFMEA for every process step. Linked to DFMEA special characteristics. High-RPNs have actions.',
+          G3: 'Validated — pilot production confirms effectiveness of controls. RPNs re-scored.',
+          G4: 'Living document. Updated with production issues, scrap/rework data, customer complaints.',
+        },
+      },
+      {
+        id: 'CP',
+        name: 'Control Plan',
+        gates: ['I','D','R','V','S'],
+        desc: 'The master document linking product characteristics → process steps → control methods → reaction plans. Exists in three maturity stages.',
+        gateNotes: {
+          G0: 'Prototype Control Plan — defines controls for prototype build.',
+          G1: 'Prototype CP executed. Pre-launch CP initiated based on DFMEA and early PFMEA.',
+          G2: 'Pre-Launch Control Plan — tighter inspection frequencies, additional checks for pilot production.',
+          G3: 'Production Control Plan — validated frequencies based on demonstrated capability. Approved.',
+          G4: 'Living document. Frequencies adjusted based on Cpk trends. Updated for process changes.',
+        },
+      },
+      {
+        id: 'WI',
+        name: 'Work Instructions',
+        gates: ['_','_','D','V','S'],
+        desc: 'Operator-level instructions for each station — step sequence, visual aids, torque specs, inspection methods, safety requirements.',
+        gateNotes: {
+          G0: '',
+          G1: '',
+          G2: 'Drafted for all stations. Visual aids, parameters, inspection criteria documented.',
+          G3: 'Validated during pilot run. Operators trained. Revised based on actual production experience.',
+          G4: 'Maintained. Updated for process changes, kaizen improvements, new operators.',
+        },
+      },
+      {
+        id: 'FLP',
+        name: 'Floor Plan Layout',
+        gates: ['_','I','D','V','S'],
+        desc: 'Physical arrangement of equipment, workstations, material flow, quality checkpoints on the production floor.',
+        gateNotes: {
+          G0: '',
+          G1: 'Initial concept based on process flow and available space.',
+          G2: 'Detailed layout with material flow, ergonomics, safety zones, quality stations defined.',
+          G3: 'Validated — layout matches actual installation. Material flow confirmed efficient.',
+          G4: 'Updated for line changes, capacity adjustments.',
+        },
+      },
+      {
+        id: 'PKG',
+        name: 'Packaging Specifications',
+        gates: ['_','I','D','V','S'],
+        desc: 'Packaging design for both in-process (inter-operation) and finished goods shipping. Protects product through supply chain.',
+        gateNotes: {
+          G0: '',
+          G1: 'Initial concepts based on product size, weight, fragility, customer requirements.',
+          G2: 'Detailed specs — materials, dimensions, labeling, shipping test plan defined.',
+          G3: 'Validated — ship tests passed. Pack-out confirmed at production rate.',
+          G4: 'Updated for cost optimization, damage claims, customer feedback.',
+        },
+      },
+    ]
+  },
+  {
+    name: 'Measurement & Capability',
+    deliverables: [
+      {
+        id: 'MSA',
+        name: 'Measurement System Analysis (MSA)',
+        gates: ['_','I','D','V','S'],
+        desc: 'Statistical studies (GR&R, bias, linearity, stability) proving that measurement systems are adequate for their intended use.',
+        gateNotes: {
+          G0: '',
+          G1: 'Plan initiated — identifies all gages/fixtures needed. MSA study plan for each.',
+          G2: 'Draft studies on prototype gages. Gage R&R, bias studies planned for production gages.',
+          G3: 'All MSA studies completed on production gages. Results acceptable (<10% GR&R for critical, <30% otherwise).',
+          G4: 'Recertified periodically. New gages added as needed.',
+        },
+      },
+      {
+        id: 'PCS',
+        name: 'Process Capability Studies (Cpk/Ppk)',
+        gates: ['_','_','I','V','S'],
+        desc: 'Statistical evidence that the production process can consistently produce within specification. Cpk ≥ 1.33 (or 1.67 for special characteristics) typically required.',
+        gateNotes: {
+          G0: '',
+          G1: '',
+          G2: 'Plan defined — which characteristics, sample sizes, acceptance criteria. Preliminary data from similar processes.',
+          G3: 'Studies completed on significant production run. Cpk/Ppk calculated. Characteristics below target have containment plans.',
+          G4: 'Ongoing SPC monitoring. Cpk trends tracked. Improvement actions for drifting processes.',
+        },
+      },
+      {
+        id: 'GAG',
+        name: 'Gages, Fixtures & Test Equipment',
+        gates: ['_','I','D','V','S'],
+        desc: 'All measurement devices, checking fixtures, functional test equipment, and end-of-line testers.',
+        gateNotes: {
+          G0: '',
+          G1: 'Requirements identified from drawings, DVP&R, and control plan. Gage concepts initiated.',
+          G2: 'Designed, ordered, or built. Calibration plans established.',
+          G3: 'Received, calibrated, MSA-qualified, deployed on floor. Operators trained.',
+          G4: 'Calibration maintained. Replaced/upgraded as needed.',
+        },
+      },
+    ]
+  },
+  {
+    name: 'Supplier & Material',
+    deliverables: [
+      {
+        id: 'SUP',
+        name: 'Supplier Selection & Qualification',
+        gates: ['I','D','R','V','S'],
+        desc: 'Identification, assessment, and qualification of all external suppliers. Includes sub-tier management.',
+        gateNotes: {
+          G0: 'Preliminary sourcing strategy. Key suppliers identified based on technology, capacity, location.',
+          G1: 'Suppliers selected. Quality system audits initiated. Long-lead items ordered.',
+          G2: 'Suppliers qualified. Sub-supplier PPAP activity tracked. Capacity confirmed.',
+          G3: 'All supplier PPAPs approved. Incoming quality performance established.',
+          G4: 'Ongoing supplier performance monitoring. Scorecards. Development for underperformers.',
+        },
+      },
+      {
+        id: 'SPP',
+        name: 'Sub-supplier PPAP',
+        gates: ['_','I','D','V','S'],
+        desc: 'PPAP submissions from suppliers — proving their processes can produce conforming components.',
+        gateNotes: {
+          G0: '',
+          G1: 'PPAP requirements communicated to suppliers. Timing aligned to program schedule.',
+          G2: 'Draft PPAPs reviewed. Early submissions on long-lead components. Issues tracked.',
+          G3: 'All sub-supplier PPAPs approved or conditionally approved with containment.',
+          G4: 'Maintained for supplier changes, re-sourcing, and engineering changes.',
+        },
+      },
+    ]
+  },
+  {
+    name: 'Validation & Approval',
+    deliverables: [
+      {
+        id: 'PBR',
+        name: 'Prototype Build & Review',
+        gates: ['I','D','V','_','_'],
+        desc: 'Physical prototype builds at increasing levels of production intent, with structured review of results.',
+        gateNotes: {
+          G0: 'Prototype plan and schedule defined.',
+          G1: 'Prototypes built (may be soft-tooled or 3D printed). Tested against DVP&R. Results feed DFMEA.',
+          G2: 'Production-intent prototypes (EVT/DVT) tested. Results confirmed. Open issues dispositioned.',
+          G3: '',
+          G4: '',
+        },
+      },
+      {
+        id: 'SPR',
+        name: 'Significant Production Run (Pilot)',
+        gates: ['_','_','I','V','S'],
+        desc: 'A production run on production tooling, at production rates, with production operators. Proves the process, not just the design.',
+        gateNotes: {
+          G0: '',
+          G1: '',
+          G2: 'Planned — quantity, duration, line speed, acceptance criteria defined.',
+          G3: 'Executed. Yield, cycle time, quality metrics recorded. Parts used for PPAP submission.',
+          G4: 'Lessons learned feed ramp-up planning and future programs.',
+        },
+      },
+      {
+        id: 'PPAP',
+        name: 'PPAP (Production Part Approval)',
+        gates: ['_','_','D','V','S'],
+        desc: 'The formal evidence package proving production process can consistently produce conforming product. Contains 18 elements including PSW.',
+        gateNotes: {
+          G0: '',
+          G1: '',
+          G2: 'PPAP elements assembled as they mature — dimensional results, material certs, MSA, capability studies, control plan, FMEA.',
+          G3: 'Full PPAP submitted to customer. Approved / Interim Approved / Rejected. PSW signed.',
+          G4: 'Re-submitted for any engineering change, process change, supplier change, or after extended production break.',
+        },
+      },
+    ]
+  },
+  {
+    name: 'Feedback & Continuous Improvement',
+    deliverables: [
+      {
+        id: 'SPC',
+        name: 'SPC / Ongoing Quality Monitoring',
+        gates: ['_','_','_','D','S'],
+        desc: 'Statistical Process Control charts and ongoing monitoring of key characteristics in production.',
+        gateNotes: {
+          G0: '',
+          G1: '',
+          G2: '',
+          G3: 'Initial SPC established during pilot run. Control limits set.',
+          G4: 'Full SPC deployment. Out-of-control reactions enforced. Data drives continuous improvement.',
+        },
+      },
+      {
+        id: 'WRR',
+        name: 'Warranty / Field Data & Lessons Learned',
+        gates: ['_','_','_','I','S'],
+        desc: 'Field performance data, warranty claims, customer satisfaction, and captured lessons for next programs.',
+        gateNotes: {
+          G0: '',
+          G1: '',
+          G2: '',
+          G3: 'Tracking system in place. Early field data collection initiated from pilot/launch units.',
+          G4: 'Ongoing analysis. Feeds back to DFMEA/PFMEA updates, next-gen VOC, and business case validation.',
+        },
+      },
+      {
+        id: 'CIP',
+        name: 'Corrective & Improvement Actions',
+        gates: ['_','_','_','D','S'],
+        desc: 'Structured problem-solving (8D, 5-Why, etc.) for production and field issues. Feeds FMEA updates and next-gen improvements.',
+        gateNotes: {
+          G0: '',
+          G1: '',
+          G2: '',
+          G3: 'Process established. Issues from pilot run tracked and resolved.',
+          G4: 'Ongoing. Links production issues, customer complaints, and warranty data to root cause and permanent corrective action.',
+        },
+      },
+    ]
+  }
+];
+
+// DEPENDENCY MAP
+// Format: { from: deliverable_id, to: deliverable_id, type: drives|informs|constrains|validates, desc: string }
+const DEPENDENCIES = [
+  { from: 'VOC', to: 'DRG', type: 'drives', desc: 'Customer needs drive design & reliability targets' },
+  { from: 'VOC', to: 'SC', type: 'drives', desc: 'Customer critical-to-quality items become special characteristics' },
+  { from: 'VOC', to: 'BPC', type: 'drives', desc: 'Market needs drive the business case' },
+  { from: 'DRG', to: 'DWG', type: 'drives', desc: 'Design goals become engineering specifications on drawings' },
+  { from: 'DRG', to: 'DVPR', type: 'drives', desc: 'Each goal maps to a verification test in DVP&R' },
+  { from: 'DRG', to: 'DFMEA', type: 'informs', desc: 'Goals define the functions whose failure modes DFMEA analyzes' },
+  { from: 'DWG', to: 'BOM', type: 'drives', desc: 'Drawings define the parts that populate the BOM' },
+  { from: 'DWG', to: 'DFMEA', type: 'drives', desc: 'Design details are the subject of DFMEA analysis' },
+  { from: 'DWG', to: 'GAG', type: 'drives', desc: 'Drawing tolerances and GD&T define gage requirements' },
+  { from: 'DWG', to: 'SC', type: 'drives', desc: 'Critical dimensions on drawings are flagged as special characteristics' },
+  { from: 'DFMEA', to: 'SC', type: 'drives', desc: 'High-severity DFMEA items become special characteristics' },
+  { from: 'DFMEA', to: 'DVPR', type: 'drives', desc: 'DFMEA detection methods drive DVP&R test plan' },
+  { from: 'DFMEA', to: 'CP', type: 'drives', desc: 'DFMEA risk items must appear in control plan' },
+  { from: 'DFMEA', to: 'PFMEA', type: 'informs', desc: 'Design risks inform process risk analysis' },
+  { from: 'DFMEA', to: 'DWG', type: 'constrains', desc: 'DFMEA findings may force design changes (ECNs)' },
+  { from: 'SC', to: 'CP', type: 'drives', desc: 'Every special characteristic must have a control in the control plan' },
+  { from: 'SC', to: 'PFMEA', type: 'drives', desc: 'Special characteristics must be addressed in PFMEA' },
+  { from: 'SC', to: 'PCS', type: 'drives', desc: 'Special characteristics require capability studies' },
+  { from: 'SC', to: 'MSA', type: 'drives', desc: 'Special characteristic gages require MSA qualification' },
+  { from: 'BOM', to: 'SUP', type: 'drives', desc: 'BOM items drive supplier selection and sourcing' },
+  { from: 'BOM', to: 'BPC', type: 'informs', desc: 'BOM cost rolls up to the business case' },
+  { from: 'PFC', to: 'PFMEA', type: 'drives', desc: 'Process flow defines the steps PFMEA analyzes' },
+  { from: 'PFC', to: 'CP', type: 'drives', desc: 'Control plan follows process flow step-by-step' },
+  { from: 'PFC', to: 'WI', type: 'drives', desc: 'Each process step has corresponding work instructions' },
+  { from: 'PFC', to: 'FLP', type: 'drives', desc: 'Process flow determines floor layout' },
+  { from: 'PFMEA', to: 'CP', type: 'drives', desc: 'PFMEA high-risk items drive control plan controls and frequencies' },
+  { from: 'PFMEA', to: 'WI', type: 'informs', desc: 'PFMEA error-proofing actions reflected in work instructions' },
+  { from: 'PFMEA', to: 'PFC', type: 'constrains', desc: 'PFMEA may require adding inspection steps to process flow' },
+  { from: 'CP', to: 'WI', type: 'drives', desc: 'Control plan inspection requirements appear in work instructions' },
+  { from: 'CP', to: 'GAG', type: 'drives', desc: 'Control plan measurement methods drive gage requirements' },
+  { from: 'CP', to: 'MSA', type: 'drives', desc: 'Gages specified in control plan require MSA' },
+  { from: 'GAG', to: 'MSA', type: 'drives', desc: 'Each gage must pass MSA before use' },
+  { from: 'MSA', to: 'PCS', type: 'validates', desc: 'MSA must pass before capability study data is valid' },
+  { from: 'PCS', to: 'CP', type: 'constrains', desc: 'Low Cpk forces tighter inspection in control plan' },
+  { from: 'PCS', to: 'PPAP', type: 'drives', desc: 'Capability results are a required PPAP element' },
+  { from: 'SUP', to: 'SPP', type: 'drives', desc: 'Selected suppliers must submit PPAP' },
+  { from: 'SPP', to: 'PPAP', type: 'drives', desc: 'Sub-supplier PPAPs are prerequisite to assembly-level PPAP' },
+  { from: 'DVPR', to: 'PPAP', type: 'drives', desc: 'DVP&R test results are a PPAP element' },
+  { from: 'SPR', to: 'PPAP', type: 'drives', desc: 'Significant production run produces the parts for PPAP' },
+  { from: 'SPR', to: 'PCS', type: 'drives', desc: 'Capability data comes from the significant production run' },
+  { from: 'PPAP', to: 'SPC', type: 'drives', desc: 'Approved PPAP with control plan defines what gets SPC monitoring' },
+  { from: 'SPC', to: 'CIP', type: 'drives', desc: 'Out-of-control SPC triggers corrective action' },
+  { from: 'WRR', to: 'VOC', type: 'informs', desc: 'Field data becomes VOC for next program — the loop closes' },
+  { from: 'WRR', to: 'DFMEA', type: 'informs', desc: 'Field failures update DFMEA for current and next program' },
+  { from: 'WRR', to: 'PFMEA', type: 'informs', desc: 'Field failures linked to process update PFMEA' },
+  { from: 'CIP', to: 'DFMEA', type: 'informs', desc: 'Corrective actions feed back into DFMEA updates' },
+  { from: 'CIP', to: 'PFMEA', type: 'informs', desc: 'Corrective actions feed back into PFMEA updates' },
+  { from: 'CIP', to: 'CP', type: 'constrains', desc: 'Corrective actions may add/modify control plan requirements' },
+  { from: 'PBR', to: 'DFMEA', type: 'validates', desc: 'Prototype test results validate or challenge DFMEA assumptions' },
+  { from: 'PBR', to: 'DVPR', type: 'validates', desc: 'Prototype results populate DVP&R report columns' },
+  { from: 'PBR', to: 'DWG', type: 'constrains', desc: 'Prototype failures may force drawing changes' },
+  { from: 'BPC', to: 'PRG', type: 'constrains', desc: 'Business case timing and budget constrain program plan' },
+];
+
+// Build flat deliverable list
+const allDeliverables = [];
+CATEGORIES.forEach(cat => {
+  cat.deliverables.forEach(d => {
+    allDeliverables.push({ ...d, category: cat.name });
+  });
+});
+
+let currentView = 'maturity';
+let selectedCell = null;
+
+function setView(view) {
+  currentView = view;
+  document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.toggle-btn')[view === 'maturity' ? 0 : 1].classList.add('active');
+  document.getElementById('maturityLegend').style.display = view === 'maturity' ? 'flex' : 'none';
+  document.getElementById('depLegend').style.display = view === 'dependencies' ? 'flex' : 'none';
+  document.getElementById('depOverlay').classList.toggle('visible', view === 'dependencies');
+  clearHighlights();
+  renderMatrix();
+}
+
+function maturityClass(code) {
+  const map = { I: 'm-initiate', D: 'm-draft', R: 'm-refine', V: 'm-validate', S: 'm-sustain' };
+  return map[code] || 'm-none';
+}
+
+function maturityLabel(code) {
+  const map = { I: 'Initiate', D: 'Draft', R: 'Refine', V: 'Validate', S: 'Sustain' };
+  return map[code] || '';
+}
+
+function renderMatrix() {
+  const table = document.getElementById('matrixTable');
+  let html = '<thead><tr><th class="deliverable-header">Deliverable</th>';
+  GATES.forEach(g => {
+    html += `<th class="gate-header">${g.id}<br><span style="font-weight:400;font-size:9px;text-transform:none;letter-spacing:0">${g.name}</span></th>`;
+  });
+  html += '</tr></thead><tbody>';
+
+  CATEGORIES.forEach(cat => {
+    html += `<tr><th class="category-header" colspan="${GATES.length + 1}">${cat.name}</th></tr>`;
+
+    cat.deliverables.forEach(d => {
+      html += `<tr class="deliverable-row" data-did="${d.id}">`;
+      html += `<td onclick="onDeliverableClick('${d.id}')">${d.name}</td>`;
+      d.gates.forEach((m, gi) => {
+        const gateId = GATES[gi].id;
+        const cellId = `cell-${d.id}-${gateId}`;
+        if (m === '_') {
+          html += `<td class="cell" id="${cellId}" data-did="${d.id}" data-gid="${gateId}"><span class="empty-cell">·</span></td>`;
+        } else {
+          html += `<td class="cell" id="${cellId}" data-did="${d.id}" data-gid="${gateId}" onclick="onCellClick('${d.id}','${gateId}')">
+            <span class="maturity-badge ${maturityClass(m)}">${m}</span>
+            <span class="maturity-label">${maturityLabel(m)}</span>
+          </td>`;
+        }
+      });
+      html += '</tr>';
+    });
+  });
+
+  html += '</tbody>';
+  table.innerHTML = html;
+}
+
+function clearHighlights() {
+  document.querySelectorAll('.cell.highlighted, .cell.dep-highlighted').forEach(c => {
+    c.classList.remove('highlighted', 'dep-highlighted');
+  });
+  document.querySelectorAll('tr.deliverable-row').forEach(r => {
+    r.style.opacity = '';
+  });
+}
+
+function onCellClick(did, gid) {
+  const d = allDeliverables.find(x => x.id === did);
+  if (!d) return;
+  const gateNote = d.gateNotes[gid] || '';
+  const gate = GATES.find(g => g.id === gid);
+  const gi = GATES.indexOf(gate);
+  const maturity = d.gates[gi];
+
+  clearHighlights();
+  const cellEl = document.getElementById(`cell-${did}-${gid}`);
+  if (cellEl) cellEl.classList.add('highlighted');
+
+  // Get dependencies for this deliverable
+  const depsFrom = DEPENDENCIES.filter(dep => dep.from === did);
+  const depsTo = DEPENDENCIES.filter(dep => dep.to === did);
+
+  let html = `<h2>${d.name}</h2>`;
+  html += `<span class="phase-tag">${gate.phase} — ${gate.id}: ${gate.name}</span>`;
+
+  if (maturity !== '_') {
+    html += `<div style="margin-top:12px"><span class="maturity-badge ${maturityClass(maturity)}" style="font-size:12px;padding:5px 12px">${maturityLabel(maturity)}</span></div>`;
+  }
+
+  html += `<h3>What happens at this gate</h3><p>${gateNote || 'Not active at this gate.'}</p>`;
+  html += `<h3>Description</h3><p>${d.desc}</p>`;
+
+  if (depsFrom.length > 0) {
+    html += `<h3>This deliverable drives / informs →</h3><div>`;
+    depsFrom.forEach(dep => {
+      const target = allDeliverables.find(x => x.id === dep.to);
+      html += `<div class="dep-tag ${dep.type}" onclick="onDeliverableClick('${dep.to}')">
+        <span class="dep-arrow">→</span> ${target ? target.name : dep.to}
+        <span style="color:var(--text-muted);margin-left:4px;font-style:italic">${dep.type}</span>
+      </div>`;
+    });
+    html += '</div>';
+  }
+
+  if (depsTo.length > 0) {
+    html += `<h3>← Driven / informed by</h3><div>`;
+    depsTo.forEach(dep => {
+      const source = allDeliverables.find(x => x.id === dep.from);
+      html += `<div class="dep-tag ${dep.type}" onclick="onDeliverableClick('${dep.from}')">
+        <span class="dep-arrow">←</span> ${source ? source.name : dep.from}
+        <span style="color:var(--text-muted);margin-left:4px;font-style:italic">${dep.type}</span>
+      </div>`;
+    });
+    html += '</div>';
+  }
+
+  showPanel(html);
+}
+
+function onDeliverableClick(did) {
+  clearHighlights();
+
+  const d = allDeliverables.find(x => x.id === did);
+  if (!d) return;
+
+  // Highlight all cells of this deliverable
+  GATES.forEach(g => {
+    const cellEl = document.getElementById(`cell-${did}-${g.id}`);
+    if (cellEl) cellEl.classList.add('highlighted');
+  });
+
+  // If in dependency view, also highlight connected deliverables
+  if (currentView === 'dependencies') {
+    const connected = new Set();
+    connected.add(did);
+    DEPENDENCIES.forEach(dep => {
+      if (dep.from === did) connected.add(dep.to);
+      if (dep.to === did) connected.add(dep.from);
+    });
+
+    // Dim non-connected rows
+    document.querySelectorAll('tr.deliverable-row').forEach(r => {
+      const rowDid = r.getAttribute('data-did');
+      if (!connected.has(rowDid)) {
+        r.style.opacity = '0.2';
+      }
+    });
+
+    // Highlight connected cells
+    connected.forEach(cid => {
+      if (cid !== did) {
+        GATES.forEach(g => {
+          const cellEl = document.getElementById(`cell-${cid}-${g.id}`);
+          if (cellEl) cellEl.classList.add('dep-highlighted');
+        });
+      }
+    });
+  }
+
+  // Build detail panel
+  const depsFrom = DEPENDENCIES.filter(dep => dep.from === did);
+  const depsTo = DEPENDENCIES.filter(dep => dep.to === did);
+
+  let html = `<h2>${d.name}</h2>`;
+  html += `<p style="margin-top:4px">${d.desc}</p>`;
+
+  html += `<h3>Maturity Progression</h3><div style="display:flex;flex-direction:column;gap:6px">`;
+  d.gates.forEach((m, gi) => {
+    if (m !== '_') {
+      const g = GATES[gi];
+      html += `<div style="display:flex;align-items:flex-start;gap:8px;cursor:pointer" onclick="onCellClick('${did}','${g.id}')">
+        <span class="maturity-badge ${maturityClass(m)}" style="min-width:60px;font-size:11px">${g.id}: ${maturityLabel(m)}</span>
+        <span style="font-size:11px;color:var(--text-dim);line-height:1.4">${d.gateNotes[g.id] || ''}</span>
+      </div>`;
+    }
+  });
+  html += '</div>';
+
+  if (depsFrom.length > 0) {
+    html += `<h3>Outputs → drives / informs</h3><div>`;
+    depsFrom.forEach(dep => {
+      const target = allDeliverables.find(x => x.id === dep.to);
+      html += `<div class="dep-tag ${dep.type}" onclick="onDeliverableClick('${dep.to}')">
+        <span class="dep-arrow">→</span> ${target ? target.name : dep.to}
+        <span style="color:var(--text-muted);margin-left:4px;font-style:italic">${dep.type}</span>
+      </div>`;
+      html += `<div style="font-size:11px;color:var(--text-muted);margin:0 0 6px 14px">${dep.desc}</div>`;
+    });
+    html += '</div>';
+  }
+
+  if (depsTo.length > 0) {
+    html += `<h3>← Inputs from</h3><div>`;
+    depsTo.forEach(dep => {
+      const source = allDeliverables.find(x => x.id === dep.from);
+      html += `<div class="dep-tag ${dep.type}" onclick="onDeliverableClick('${dep.from}')">
+        <span class="dep-arrow">←</span> ${source ? source.name : dep.from}
+        <span style="color:var(--text-muted);margin-left:4px;font-style:italic">${dep.type}</span>
+      </div>`;
+      html += `<div style="font-size:11px;color:var(--text-muted);margin:0 0 6px 14px">${dep.desc}</div>`;
+    });
+    html += '</div>';
+  }
+
+  showPanel(html);
+}
+
+function showPanel(html) {
+  document.getElementById('detailContent').innerHTML = html;
+  document.getElementById('detailPanel').classList.add('open');
+  document.getElementById('overlay').classList.add('open');
+}
+
+function closePanel() {
+  document.getElementById('detailPanel').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+  clearHighlights();
+}
+
+// Init
+renderMatrix();
+</script>
+</body>
+</html>

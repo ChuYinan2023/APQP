@@ -1,0 +1,583 @@
+{
+  "document": {
+    "title": "KP1_CTS_零部件技术规范",
+    "english_title": "Component Technical Specification (CTS) - Fuel supply line",
+    "program": "STELLANTIS PROGRAM KP1 A&B",
+    "release": "00",
+    "release_date": "Mar.09, 2022",
+    "component_type": "Fuel supply line",
+    "primary_function": "Transport Fuel from Fuel Tank to Engine"
+  },
+  "critical_technical_requirements": [
+    {
+      "id": "CTR-001",
+      "category": "Material Treatment",
+      "requirement": "Metallic pipe internal nickel plate treatment",
+      "specification": "PF.90197 section 5",
+      "mandatory": true,
+      "applies_to": "All metallic tubes",
+      "criticality": "CRITICAL"
+    },
+    {
+      "id": "CTR-002",
+      "category": "Component Protection",
+      "requirement": "Protection caps on all hose extremities",
+      "specification": "Section 2.7 - Component Protection",
+      "materials": ["plastic", "rubber", "metal"],
+      "mandatory": true,
+      "exceptions": "Can be eliminated only with specific agreement from Plant UTE and STELLANTIS Quality dept",
+      "criticality": "CRITICAL"
+    },
+    {
+      "id": "CTR-003",
+      "category": "Interface Connector",
+      "requirement": "Quick connector compliance",
+      "specification": "PF.90298, SAE J2044",
+      "mandatory": true,
+      "criticality": "CRITICAL"
+    },
+    {
+      "id": "CTR-004",
+      "category": "Material Compliance",
+      "requirement": "Restricted and Prohibited Substances compliance",
+      "specification": "STELLANTIS CS-9003",
+      "mandatory": true,
+      "criticality": "CRITICAL"
+    }
+  ],
+  "chapter_3_technical_specifications": {
+    "title": "Technical Specification",
+    "sections": [
+      {
+        "section_number": "3.1",
+        "title": "Performance",
+        "requirements": [
+          {
+            "requirement": "Internal nickel plate treatment on metallic pipes",
+            "specification": "PF.90197 section 5",
+            "mandatory": true
+          }
+        ]
+      },
+      {
+        "section_number": "3.2",
+        "title": "Environmental Requirements",
+        "requirements": [
+          {
+            "requirement": "All materials consistent to STELLANTIS CS-9003",
+            "specification": "CS-9003",
+            "mandatory": true
+          },
+          {
+            "requirement": "Materials should be recyclable as much as possible",
+            "specification": "STELLANTIS 00256",
+            "mandatory": true
+          },
+          {
+            "requirement": "Marking on Fuel and Vapor Lines",
+            "specification": "STELLANTIS 07416",
+            "mandatory": true
+          },
+          {
+            "requirement": "VOC, Odor and Prohibited Substances requirements",
+            "specification": "MS-AO-0001",
+            "mandatory": true,
+            "version": "2018-9-12 Version 2.1"
+          },
+          {
+            "requirement": "Material data sheet via IMDS system",
+            "specification": "IMDS system",
+            "mandatory": true,
+            "note": "Production approval only after STELLANTIS receives material data"
+          }
+        ]
+      },
+      {
+        "section_number": "3.3",
+        "title": "Appearance/Physical/Mechanical/Electrical Requirements",
+        "specification": "PF.90197 section 6",
+        "requirements": [
+          {
+            "requirement": "Visual inspection standards",
+            "specification": "PF.90197 section 6"
+          },
+          {
+            "requirement": "Dimensional tolerance compliance",
+            "specification": "PF.90197 section 6, ASME Y14.5-2009"
+          },
+          {
+            "requirement": "Material property verification",
+            "specification": "PF.90197 section 6"
+          },
+          {
+            "requirement": "Electrical property compliance",
+            "specification": "PF.90197 section 6, PF.90271"
+          }
+        ]
+      },
+      {
+        "section_number": "3.4",
+        "title": "Functional Requirements",
+        "specification": "PF.90197 section 7",
+        "requirements": [
+          {
+            "requirement": "Fuel bundle and fuel system jumpers compliance",
+            "specification": "PF.90197",
+            "materials": ["plastic", "rubber", "metallic"]
+          },
+          {
+            "requirement": "Quick connector functionality",
+            "specification": "PF.90298, SAE J2044"
+          },
+          {
+            "requirement": "Rubber o-rings seals compliance",
+            "specification": "9.14618"
+          },
+          {
+            "requirement": "Steel pipes compliance",
+            "specification": "9.02145/02"
+          }
+        ]
+      },
+      {
+        "section_number": "3.5",
+        "title": "Safety and Regulatory Requirements",
+        "specification": "PF.90197 section 8",
+        "requirements": [
+          {
+            "requirement": "EC (European Community) compliance",
+            "specification": "EC regulations"
+          },
+          {
+            "requirement": "ECE (Economic Commission Europe) compliance",
+            "specification": "ECE regulations"
+          }
+        ]
+      },
+      {
+        "section_number": "3.6",
+        "title": "Reliability/Durability Requirements",
+        "specification": "PF.90197 section 9",
+        "requirements": [
+          {
+            "requirement": "Long-term performance under operating conditions",
+            "specification": "PF.90197 section 9"
+          }
+        ]
+      },
+      {
+        "section_number": "3.7",
+        "title": "Component Protection",
+        "requirements": [
+          {
+            "requirement": "Protection caps on all hose extremities",
+            "materials": ["plastic", "rubber", "metal"],
+            "mandatory": true,
+            "details": {
+              "applies_to": "All hose extremities",
+              "exception": "Can be eliminated only with specific agreement with Plant UTE and STELLANTIS Quality dept",
+              "design_criteria": "Caps must be shaped according to specific criteria",
+              "coordination": "Transport conditions must be shared with Manufacturing Engineering dept"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "chapter_4_validation": {
+    "title": "Validation",
+    "requirements": [
+      {
+        "phase": "Design Validation (DV)",
+        "requirement": "Supplier must provide one DV plan per component",
+        "format": "STELLANTIS norm 07740 annex 2",
+        "reference": "Annex A PF.90197"
+      },
+      {
+        "phase": "Production Validation (PV)",
+        "requirement": "Supplier must provide one PV (AQF) plan per component",
+        "format": "STELLANTIS norm 07740 annex 2",
+        "reference": "Annex A PF.90197"
+      },
+      {
+        "phase": "Testing Guidelines",
+        "requirements": [
+          {
+            "guideline": "All STELLANTIS specification tests must be listed",
+            "note": "All tests must be present, even if not planned"
+          },
+          {
+            "guideline": "DV non-execution documentation",
+            "action": "Write reason in NOTE column and color line grey",
+            "valid_reasons": ["Part not representative", "Other causes"]
+          },
+          {
+            "guideline": "PV extension documentation",
+            "action": "If extending tests from DV, document in NOTE column and color grey",
+            "example": "Part already OTOP"
+          },
+          {
+            "guideline": "Requalification tests",
+            "action": "Mandatory to fill requalification tests column",
+            "specification": "STELLANTIS SPC 07740"
+          },
+          {
+            "guideline": "Complement components",
+            "requirement": "Provide DV and PV plans for complement components",
+            "examples": ["ICV", "etc."]
+          }
+        ]
+      }
+    ]
+  },
+  "referenced_standards": {
+    "primary_specification": [
+      {
+        "code": "PF.90197",
+        "title": "Fuel bundle and fuel system jumpers",
+        "materials": ["plastic", "rubber", "metallic"],
+        "sections": {
+          "5": "Environmental requirements",
+          "6": "Appearance/Physical/Mechanical/Electrical requirements",
+          "7": "Functional requirements",
+          "8": "Safety and regulatory requirements",
+          "9": "Reliability/Durability requirements"
+        },
+        "reference": "Annex A contains detailed test matrix"
+      }
+    ],
+    "interface_standards": [
+      {
+        "code": "PF.90298",
+        "title": "Quick connect - fuel system",
+        "cross_reference": "SAE J2044"
+      },
+      {
+        "code": "SAE J2044",
+        "title": "Quick Connector Standard",
+        "type": "Interface"
+      }
+    ],
+    "material_standards": {
+      "plastics": [
+        {
+          "code": "MS.50017",
+          "title": "Plastics - thermoplastic - polyamide (nylon)",
+          "note": "harmonized 2 in 1"
+        },
+        {
+          "code": "9.55253",
+          "title": "Miscellaneous plastic component (thermoplastic or thermosetting)"
+        }
+      ],
+      "elastomers": [
+        {
+          "code": "MS.50015",
+          "title": "Thermoplastic vulcanizates - EPDM/PP",
+          "note": "harmonized 2 in 1"
+        },
+        {
+          "code": "9.14618",
+          "title": "Rubber o-rings seals"
+        }
+      ],
+      "metals": [
+        {
+          "code": "9.02145/02",
+          "title": "Electrowelded steel pipes for fuel circuits"
+        }
+      ],
+      "protective_sleeves": [
+        {
+          "code": "PF.90271",
+          "title": "Electrical system insulating components wiring harness protection sleeves"
+        }
+      ],
+      "adhesives_tapes": [
+        {
+          "code": "MS.90111",
+          "title": "Tape"
+        },
+        {
+          "code": "MS.90074",
+          "title": "Pressure-sensitive adhesive labels for vehicle interior",
+          "note": "harmonized 2 in 1"
+        }
+      ]
+    },
+    "environmental_compliance": [
+      {
+        "code": "CS-9003",
+        "title": "Supplier Requirements for Vehicle and Service Parts: Restricted and Prohibited Substances",
+        "mandatory": true
+      },
+      {
+        "code": "07416",
+        "title": "Recycling markings for plastic, composite and elastomer components",
+        "mandatory": true
+      },
+      {
+        "code": "00256",
+        "title": "Recyclability and recoverability of a vehicle",
+        "reference": "Green list"
+      },
+      {
+        "code": "MS-AO-0001",
+        "title": "VOC, Odor and Prohibited Substances Requirements",
+        "version": "2018-9-12 Version 2.1"
+      },
+      {
+        "code": "IMDS",
+        "title": "I.M.D.S. system for material recyclability",
+        "requirement": "Material data sheets mandatory for production approval"
+      }
+    ],
+    "quality_and_process": [
+      {
+        "code": "9.01102",
+        "title": "Supplier Quality"
+      },
+      {
+        "code": "9.01103",
+        "title": "Product quality and conformity certificate"
+      },
+      {
+        "code": "07740",
+        "title": "Qualification procedure (DV/PV planning)"
+      },
+      {
+        "code": "00270",
+        "title": "Product FMEA",
+        "cross_reference": "CS.00133"
+      },
+      {
+        "code": "00271",
+        "title": "Process FMEA"
+      },
+      {
+        "code": "07610",
+        "title": "Supplier code"
+      },
+      {
+        "code": "07611",
+        "title": "Supplier alphanumeric code marking - indications on drawing"
+      },
+      {
+        "code": "08034",
+        "title": "Procedure for the individuation of integration level of product"
+      },
+      {
+        "code": "QR-00001",
+        "title": "Global product assurance testing (GPAT)"
+      }
+    ],
+    "marking_and_identification": [
+      {
+        "code": "0.00013",
+        "title": "Procedure for vehicle part marking"
+      },
+      {
+        "code": "CS.11000",
+        "title": "Motor Vehicle Part Marking Procedure - sol. F / MOPAR LOGO"
+      },
+      {
+        "code": "9.01111",
+        "title": "Ergonomics"
+      }
+    ],
+    "cad_and_drawing": [
+      {
+        "code": "CS.00080",
+        "title": "CAD drawings, CAD modelling/drawings rules"
+      },
+      {
+        "code": "CS.00029",
+        "title": "CAD drawings - Rules for 3DA documentation definition"
+      },
+      {
+        "code": "CS.00003",
+        "title": "New drawing title block – definitions and completion rules"
+      },
+      {
+        "code": "07264",
+        "title": "CAD drawings types and sides of lines and characters"
+      },
+      {
+        "code": "07226",
+        "title": "TcAE system and CAD part management"
+      },
+      {
+        "code": "07247",
+        "title": "CAD drawings – Self-certification of the quality of the CAD parts"
+      },
+      {
+        "code": "07247/01",
+        "title": "CAD drawings – Self-certification of graphs quality (E&D)"
+      },
+      {
+        "code": "07265",
+        "title": "CAD drawings library symbols"
+      },
+      {
+        "code": "01366/01",
+        "title": "Graphic symbols on drawings"
+      },
+      {
+        "code": "01376/02",
+        "title": "Symbols on technical drawings (geometrical tolerances)"
+      },
+      {
+        "code": "ASME Y14.5-2009",
+        "title": "Dimensioning and tolerancing"
+      },
+      {
+        "code": "CS.00019",
+        "title": "Geometric dimensioning and tolerancing practices (ASME addendum)"
+      }
+    ],
+    "package_specification": [
+      {
+        "code": "PRO.00004",
+        "title": "STELLANTIS Package Specification",
+        "requirement": "All CAD model changes must be fully compliant"
+      }
+    ]
+  },
+  "nickel_plating_requirement": {
+    "description": "Internal nickel plating treatment for metallic tubes",
+    "applies_to": "All metallic fuel tubes/pipes",
+    "specification": "PF.90197 section 5",
+    "requirement_text": "Metallic pipe is required internal nickel plate treatment",
+    "mandatory": true,
+    "criticality": "CRITICAL",
+    "section_reference": "Chapter 3.1 - Performance"
+  },
+  "protection_cap_requirements": {
+    "description": "Protection caps for fuel line hose extremities",
+    "applies_to": "All hose extremities",
+    "materials": ["plastic", "rubber", "metal"],
+    "requirement": "Protection caps are requested on all hose extremities (plastic, rubber or metal)",
+    "mandatory": true,
+    "exceptions": {
+      "allowed": true,
+      "condition": "Only with specific agreement with Plant UTE and STELLANTIS Quality dept"
+    },
+    "design_requirements": {
+      "storage": "Transport conditions of the new type of component storage have to be shared with Manufacturing Engineering dept",
+      "shape": "Protection caps have to be shaped according to following criteria",
+      "note": "Specific design criteria referenced but details in design drawings section"
+    },
+    "section_reference": "Chapter 3.7 - Component Protection"
+  },
+  "design_requirements": {
+    "cad_standards": {
+      "requirement": "CAD drawing standard has to be fully compliant with requirements of §2.4.3",
+      "standard_tools": "Latest version of UG/Teamcenter",
+      "standards": ["CS.00080", "CS.00029", "07247"]
+    },
+    "package_specification": {
+      "code": "PRO.00004",
+      "requirement": "All changes to the CAD model allowed to suppliers regarding Fuel and Vapor Lines geometry have to be fully compliant",
+      "supplier_responsibility": "Must be updated and share STELLANTIS Package Team Requirements through all phases"
+    },
+    "functionality": {
+      "requirement": "All parts of Fuel and Vapor Lines have to be designed by Supplier properly in order to guarantee proper functionality of Fuel and Vapor Lines assembly"
+    }
+  },
+  "material_requirements": {
+    "compliance": {
+      "standard": "STELLANTIS CS-9003",
+      "requirement": "All materials must be consistent to STELLANTIS CS-9003",
+      "mandatory": true
+    },
+    "recyclability": {
+      "requirement": "Materials used in Fuel and Vapor Lines should be recyclable as much as possible",
+      "calculation_method": "STELLANTIS 00256 (green list)",
+      "action": "Point out eventual criticalities to Material dept"
+    },
+    "marking": {
+      "standard": "STELLANTIS 07416",
+      "requirement": "Marking on the Fuel and Vapor Lines must be consistent to STELLANTIS 07416",
+      "mandatory": true
+    },
+    "imds_system": {
+      "requirement": "Supplier must use the IMDS system for materials recyclability",
+      "approval": "Production approval will be given only after STELLANTIS has received material data sheet via IMDS system",
+      "mandatory": true
+    },
+    "alternatives": {
+      "process": "Alternative materials will be evaluated by STELLANTIS during the sourcing process",
+      "documentation": "Supplier must provide list of all materials according STELLANTIS guidelines"
+    }
+  },
+  "precedence_and_conflicts": {
+    "order_of_precedence": [
+      {
+        "level": 1,
+        "description": "This specification (KP1_CTS) text"
+      },
+      {
+        "level": 2,
+        "description": "Documents cited herein"
+      },
+      {
+        "level": 3,
+        "description": "STELLANTIS specifications (higher requirements apply in conflict)"
+      },
+      {
+        "level": 4,
+        "description": "Government laws and regulations (unless specific exemption obtained)"
+      }
+    ]
+  },
+  "supplier_deliverables": {
+    "documentation": [
+      {
+        "item": "Deviation List",
+        "when": "For any deviations from target mainstream solution",
+        "submission": "During Technical Review"
+      },
+      {
+        "item": "DV Plan",
+        "requirement": "One per component",
+        "format": "STELLANTIS norm 07740 annex 2",
+        "reference": "Annex A PF.90197"
+      },
+      {
+        "item": "PV (AQF) Plan",
+        "requirement": "One per component",
+        "format": "STELLANTIS norm 07740 annex 2",
+        "reference": "Annex A PF.90197"
+      },
+      {
+        "item": "Product FMEA",
+        "specification": "00270 (CS.00133)"
+      },
+      {
+        "item": "Process FMEA",
+        "specification": "00271"
+      },
+      {
+        "item": "Material List",
+        "requirements": [
+          "According to STELLANTIS guidelines",
+          "Via IMDS system",
+          "With material data sheets"
+        ]
+      },
+      {
+        "item": "CAD Drawings",
+        "specifications": ["CS.00080", "CS.00029", "07247"]
+      }
+    ]
+  },
+  "extraction_metadata": {
+    "extraction_date": "2026-03-01",
+    "document_source": "/home/chu2026/Documents/github/APQP/docs/emma/oem-requirements/test/KP1_CTS_零部件技术规范.docx",
+    "document_release": "00",
+    "document_release_date": "Mar.09, 2022",
+    "extraction_method": "python-docx library",
+    "total_paragraphs": 188,
+    "total_tables": 6
+  }
+}
