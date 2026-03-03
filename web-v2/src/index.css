@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+@theme {
+  --color-navy-deep: #080e18;
+  --color-navy: #0f1d2f;
+  --color-navy-card: #111e30;
+  --color-navy-light: #1a2d47;
+  --color-gold: #c4a24e;
+  --color-gold-light: #e8d9a0;
+  --color-gold-dim: #8b7234;
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-light: rgba(255, 255, 255, 0.12);
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'Noto Sans SC', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background-color: #080e18;
+  color: #e2e8f0;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Animations */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse-gold {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(196, 162, 78, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 12px 4px rgba(196, 162, 78, 0.15);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.4s ease-out both;
+}
+
+.animate-fade-in-right {
+  animation: fade-in-right 0.35s ease-out both;
+}
+
+.animate-pulse-gold {
+  animation: pulse-gold 2s ease-in-out infinite;
+}
